@@ -1,0 +1,58 @@
+require:
+  - rubocop-performance
+  - rubocop-rspec
+
+AllCops:
+  TargetRubyVersion: 2.7
+  NewCops: enable
+  SuggestExtensions: false
+Layout/ArgumentAlignment:
+  EnforcedStyle: with_fixed_indentation
+Layout/MultilineMethodCallBraceLayout:
+  EnforcedStyle: new_line
+Layout/MultilineMethodCallIndentation:
+  EnforcedStyle: indented
+Layout/MultilineMethodDefinitionBraceLayout:
+  EnforcedStyle: new_line
+Metrics/AbcSize:
+  Max: 30
+Metrics/BlockLength:
+  Exclude:
+    - spec/**/*
+Metrics/ClassLength:
+  Enabled: false
+Metrics/CyclomaticComplexity:
+  Max: 8
+Metrics/MethodLength:
+  Max: 20
+Style/FrozenStringLiteralComment:
+  Exclude:
+    - '**/*.gemspec'
+    - Rakefile
+    - Gemfile
+    - spec/**/*
+Style/MultilineIfModifier:
+  Enabled: false
+Style/OpenStructUse:
+  Enabled: false
+
+RSpec/ContextWording:
+  Enabled: false
+RSpec/ExampleLength:
+  Enabled: false
+RSpec/FilePath:
+  Enabled: false
+RSpec/LeakyConstantDeclaration:
+  Enabled: false
+RSpec/MultipleDescribes:
+  Enabled: false
+RSpec/MultipleMemoizedHelpers:
+  Enabled: false
+RSpec/MultipleExpectations:
+  Enabled: false
+RSpec/NestedGroups:
+  Enabled: false
+RSpec/NotToNot:
+  EnforcedStyle: to_not
+RSpec/ScatteredSetup:
+  Enabled: false
