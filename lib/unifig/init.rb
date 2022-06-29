@@ -13,7 +13,7 @@ module Unifig
     #       value: "baz"
     #   YML
     #
-    # @param [String] A YAML config.
+    # @param str [String] A YAML config.
     #
     # @raise [YAMLSyntaxError]
     def self.load(str)
