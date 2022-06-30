@@ -25,6 +25,14 @@ RSpec.describe Unifig::Init do
         expect { load }.to raise_error Unifig::YAMLSyntaxError
       end
     end
+
+    context 'with an invalid alias' do
+      let(:str) { 'a: *b' }
+
+      it 'throws an error' do
+        expect { load }.to raise_error Unifig::YAMLSyntaxError
+      end
+    end
   end
 
   describe '#exec!' do

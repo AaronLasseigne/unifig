@@ -19,7 +19,7 @@ module Unifig
     def self.load(str)
       yml = Psych.load(str, symbolize_names: true)
       new(yml).exec!
-    rescue Psych::SyntaxError => e
+    rescue Psych::SyntaxError, Psych::BadAlias => e
       raise YAMLSyntaxError, e.message
     end
 
