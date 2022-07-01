@@ -14,6 +14,7 @@ module Unifig
     #   YML
     #
     # @param str [String] A YAML config.
+    # @param env [Symbol] An environment to load.
     #
     # @raise [YAMLSyntaxError]
     def self.load(str, env)
