@@ -24,4 +24,10 @@ RSpec.configure do |config|
 
   config.order = :random
   Kernel.srand config.seed
+
+  config.before do
+    Unifig.methods(false).each do |name|
+      Unifig.singleton_class.remove_method(name)
+    end
+  end
 end
