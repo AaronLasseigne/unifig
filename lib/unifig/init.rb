@@ -16,24 +16,50 @@ module Unifig
     # @param str [String] A YAML config.
     #
     # @raise [YAMLSyntaxError]
-    def self.load(str)
+    def self.load(str, env)
       yml = Psych.load(str, symbolize_names: true)
-      new(yml).exec!
+      new(yml, env).exec!
     rescue Psych::SyntaxError, Psych::BadAlias => e
       raise YAMLSyntaxError, e.message
     end
 
     # @private
-    def initialize(yml)
+    def initialize(yml, env)
       @yml = yml
+      @env = env
     end
 
     # @private
     def exec!
-      @yml.each do |var, config|
-        Unifig.define_singleton_method(var.downcase) do
-          config[:value]
+      providers = Providers.list
+      return if providers.empty?
+
+      vars = {}
+      local_values = {}
+      @yml.each do |name, config|
+        local_values[name] = get_local_value(config)
+        vars[name] = Var.new(name, config)
+      end
+      Unifig::Providers::Local.load(local_values)
+
+      providers.each do |provider|
+        values = provider.retrieve(vars.keys)
+
+        values.each do |name, value|
+          attach_method(vars[name], value)
         end
+      end
+    end
+
+    private
+
+    def get_local_value(config)
+      config.dig(:envs, @env, :value) || config[:value]
+    end
+
+    def attach_method(var, value)
+      Unifig.define_singleton_method(var.method) do
+        value
       end
     end
   end
