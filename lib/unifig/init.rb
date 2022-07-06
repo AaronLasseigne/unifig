@@ -43,9 +43,9 @@ module Unifig
 
       vars = {}
       local_values = {}
-      @yml.each do |name, config|
-        local_values[name] = get_local_value(config)
-        vars[name] = Var.new(name, config)
+      @yml.each do |name, local_config|
+        local_values[name] = get_local_value(local_config)
+        vars[name] = Var.new(name, local_config)
       end
       Unifig::Providers::Local.load(local_values)
 
@@ -60,8 +60,8 @@ module Unifig
 
     private
 
-    def get_local_value(config)
-      config.dig(:envs, @env, :value) || config[:value]
+    def get_local_value(local_config)
+      local_config.dig(:envs, @env, :value) || local_config[:value]
     end
 
     def attach_method(var, value)

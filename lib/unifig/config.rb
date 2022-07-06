@@ -5,11 +5,13 @@ module Unifig
   class Config
     def initialize(config, env)
       @config = config
-      @env = env
+      @env = @config.dig(:envs, env)
     end
 
+    attr_reader :env
+
     def providers
-      Array(@config.dig(:envs, @env, :providers)).map(&:to_sym).freeze
+      @providers ||= Array(env[:providers]).map(&:to_sym).freeze
     end
   end
 end

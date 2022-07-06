@@ -14,7 +14,7 @@ module Unifig
     end
 
     def self.all
-      @all ||= constants(false).map { |c| const_get(c, false) }
+      @all ||= constants(false).map { |c| const_get(c, false) }.freeze
     end
   end
 end
