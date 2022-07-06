@@ -9,6 +9,11 @@ module Unifig
     #
     # @example
     #   Unifig::Init.load(<<~YML)
+    #     config:
+    #       envs:
+    #         development:
+    #           providers: local
+    #
     #     FOO_BAR:
     #       value: "baz"
     #   YML
@@ -16,8 +21,9 @@ module Unifig
     # @param str [String] A YAML config.
     # @param env [Symbol] An environment name to load.
     #
-    # @raise [YAMLSyntaxError]
-    # @raise [MissingConfig]
+    # @raise [YAMLSyntaxError] - Invalid YAML
+    # @raise (see #initialize)
+    # @raise (see Unifig::Providers.list)
     def self.load(str, env)
       yml = Psych.load(str, symbolize_names: true)
       new(yml, env).exec!
@@ -26,6 +32,8 @@ module Unifig
     end
 
     # @private
+    #
+    # @raise [MissingConfig] - No config section was provided in the YAML.
     def initialize(yml, env)
       @yml = yml
       @env = env
