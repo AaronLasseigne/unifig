@@ -14,7 +14,7 @@ module Unifig
     #   YML
     #
     # @param str [String] A YAML config.
-    # @param env [Symbol] An environment to load.
+    # @param env [Symbol] An environment name to load.
     #
     # @raise [YAMLSyntaxError]
     # @raise [MissingConfig]
