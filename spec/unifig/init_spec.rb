@@ -20,11 +20,29 @@ RSpec.describe Unifig::Init do
       end
     end
 
-    context 'with valid YAML' do
+    context 'without a config' do
       let(:str) do
         <<~YML
           FOO_BAR:
             value: "baz"
+        YML
+      end
+
+      it 'throws an error' do
+        expect { load }.to raise_error Unifig::MissingConfig
+      end
+    end
+
+    context 'with a config' do
+      let(:str) do
+        <<~YML
+          config:
+            envs:
+              development:
+                providers: local
+
+          FOO_BAR:
+            value: baz
         YML
       end
 
@@ -34,16 +52,59 @@ RSpec.describe Unifig::Init do
         expect(Unifig).to respond_to(:foo_bar)
         expect(Unifig.foo_bar).to eql 'baz'
       end
+
+      context 'with no providers' do
+        let(:str) do
+          <<~YML
+            config:
+              envs:
+                development:
+                  providers:
+
+            FOO_BAR:
+              value: baz
+          YML
+        end
+
+        it 'loads nothing' do
+          load
+
+          expect(Unifig).to_not respond_to(:foo_bar)
+        end
+      end
+
+      context 'with an invalid provider' do
+        let(:str) do
+          <<~YML
+            config:
+              envs:
+                development:
+                  providers: invalid
+
+            FOO_BAR:
+              value: baz
+          YML
+        end
+
+        it 'throws an error' do
+          expect { load }.to raise_error Unifig::MissingProvider
+        end
+      end
     end
 
     context 'with an env override' do
       let(:str) do
         <<~YML
-          FOO_BAR:
-            value: "baz"
+          config:
             envs:
               development:
-                value: "boz"
+                providers: local
+
+          FOO_BAR:
+            value: baz
+            envs:
+              development:
+                value: boz
         YML
       end
 

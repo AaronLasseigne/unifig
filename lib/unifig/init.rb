@@ -17,6 +17,7 @@ module Unifig
     # @param env [Symbol] An environment to load.
     #
     # @raise [YAMLSyntaxError]
+    # @raise [MissingConfig]
     def self.load(str, env)
       yml = Psych.load(str, symbolize_names: true)
       new(yml, env).exec!
@@ -28,11 +29,16 @@ module Unifig
     def initialize(yml, env)
       @yml = yml
       @env = env
+
+      config = @yml[:config]
+      raise MissingConfig unless config
+
+      @config = Config.new(config, @env)
     end
 
     # @private
     def exec!
-      providers = Providers.list
+      providers = Providers.list(@config.providers)
       return if providers.empty?
 
       vars = {}

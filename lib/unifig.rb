@@ -3,6 +3,7 @@
 require_relative 'unifig/version'
 
 require_relative 'unifig/errors'
+require_relative 'unifig/config'
 require_relative 'unifig/var'
 require_relative 'unifig/init'
 require_relative 'unifig/providers'
