@@ -25,9 +25,32 @@ RSpec.configure do |config|
   config.order = :random
   Kernel.srand config.seed
 
+  # clear Unifg methods
   config.before do
     Unifig.methods(false).each do |name|
       Unifig.singleton_class.remove_method(name)
     end
+  end
+
+  # Add a fake Provider for testing
+  config.before(:suite) do
+    module Unifig # rubocop:disable Lint/ConstantDefinitionInBlock
+      module Providers
+        module FortyTwo
+          def self.name
+            :forty_two
+          end
+
+          def self.retrieve(var_names)
+            var_names.to_h do |var_name|
+              [var_name, 42]
+            end
+          end
+        end
+      end
+    end
+  end
+  config.after(:suite) do
+    Unifig::Providers.send(:remove_const, :FortyTwo)
   end
 end
