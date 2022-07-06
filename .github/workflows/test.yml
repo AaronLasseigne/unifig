@@ -1,0 +1,38 @@
+name: Test
+
+on: [push, pull_request]
+
+jobs:
+  lint:
+    name: Lint
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: "3.1"
+        bundler-cache: true
+    - name: Lint
+      run: bundle exec rake rubocop
+
+  test:
+    name: Test Ruby ${{ matrix.ruby }}
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        ruby: ["2.7", "3.0", "3.1"]
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Ruby ${{ matrix.ruby }}
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: ${{ matrix.ruby }}
+        bundler-cache: true
+    - name: Test
+      run: bundle exec rake spec
