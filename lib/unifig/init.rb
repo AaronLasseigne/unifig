@@ -3,12 +3,12 @@
 require 'yaml'
 
 module Unifig
-  # Initializes Unifig with methods based on the unifig.yml file.
+  # Initializes Unifig with methods based on YAML.
   class Init
     # Loads a string of YAML to configure Unifig.
     #
     # @example
-    #   Unifig::Init.load(<<~YML)
+    #   Unifig::Init.load(<<~YML, :development)
     #     config:
     #       envs:
     #         development:
@@ -29,6 +29,21 @@ module Unifig
       new(yml, env).exec!
     rescue Psych::SyntaxError, Psych::BadAlias => e
       raise YAMLSyntaxError, e.message
+    end
+
+    # Loads a YAML file to configure Unifig.
+    #
+    # @example
+    #   Unifig::Init.load_file('config.yml', :development)
+    #
+    # @param file_path [String] The path to a YAML config file.
+    # @param env [Symbol] An environment name to load.
+    #
+    # @raise (see Unifig::Init.load)
+    def self.load_file(file_path, env)
+      # Ruby 2.7 Psych.load_file doesn't support the :symbolize_names flag.
+      # After Ruby 2.7 this can be changed to Psych.load_file if that's faster.
+      load(File.read(file_path), env)
     end
 
     # @private
