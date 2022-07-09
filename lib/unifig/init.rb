@@ -73,9 +73,7 @@ module Unifig
       Unifig::Providers::Local.load(local_values)
 
       providers.each do |provider|
-        values = provider.retrieve(vars.keys)
-
-        values.each do |name, value|
+        provider.retrieve(vars.keys).each do |name, value|
           attach_method(vars[name], value)
         end
       end
