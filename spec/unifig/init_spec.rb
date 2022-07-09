@@ -83,6 +83,28 @@ RSpec.describe Unifig::Init do
         expect(Unifig.foo_bar).to eql 'boz'
       end
     end
+
+    context 'from multiple providers' do
+      let(:str) do
+        <<~YML
+          config:
+            envs:
+              development:
+                providers: [local, forty_two]
+
+          FOO:
+          BAR:
+            value: bar
+        YML
+      end
+
+      it 'returns the values from the providers in order' do
+        load
+
+        expect(Unifig.foo).to be 42
+        expect(Unifig.bar).to eql 'bar'
+      end
+    end
   end
 
   describe '.load_file' do

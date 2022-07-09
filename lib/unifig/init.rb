@@ -53,7 +53,7 @@ module Unifig
       @yml = yml
       @env = env
 
-      config = @yml[:config]
+      config = @yml.delete(:config)
       raise MissingConfig unless config
 
       @config = Config.new(config, @env)
@@ -67,15 +67,19 @@ module Unifig
       vars = {}
       local_values = {}
       @yml.each do |name, local_config|
+        local_config = {} if local_config.nil?
+
         local_values[name] = get_local_value(local_config)
         vars[name] = Var.new(name, local_config)
       end
       Unifig::Providers::Local.load(local_values)
 
       providers.each do |provider|
-        provider.retrieve(vars.keys).each do |name, value|
+        values = provider.retrieve(vars.keys)
+        values.each do |name, value|
           attach_method(vars[name], value)
         end
+        vars = vars.except(*values.keys)
       end
     end
 
