@@ -11,7 +11,7 @@ module Unifig
     attr_reader :name, :config
 
     def method
-      @method ||= name.downcase
+      @method ||= name.to_s.downcase.tr('-', '_').to_sym
     end
   end
 end
