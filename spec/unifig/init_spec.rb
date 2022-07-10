@@ -60,30 +60,6 @@ RSpec.describe Unifig::Init do
 
     include_examples 'basic load tests'
 
-    context 'with an env override' do
-      let(:str) do
-        <<~YML
-          config:
-            envs:
-              development:
-                providers: local
-
-          FOO_BAR:
-            value: baz
-            envs:
-              development:
-                value: boz
-        YML
-      end
-
-      it 'loads up a string of yaml' do
-        load
-
-        expect(Unifig).to respond_to(:foo_bar)
-        expect(Unifig.foo_bar).to eql 'boz'
-      end
-    end
-
     context 'from multiple providers' do
       let(:str) do
         <<~YML

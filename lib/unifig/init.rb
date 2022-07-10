@@ -69,8 +69,8 @@ module Unifig
       @yml.each do |name, local_config|
         local_config = {} if local_config.nil?
 
-        local_values[name] = get_local_value(local_config)
-        vars[name] = Var.new(name, local_config)
+        vars[name] = Var.new(name, local_config, @env)
+        local_values[name] = vars[name].local_value
       end
       Unifig::Providers::Local.load(local_values)
 
@@ -84,10 +84,6 @@ module Unifig
     end
 
     private
-
-    def get_local_value(local_config)
-      local_config.dig(:envs, @env, :value) || local_config[:value]
-    end
 
     def attach_method(var, value)
       Unifig.define_singleton_method(var.method) do
