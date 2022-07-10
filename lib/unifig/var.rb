@@ -16,7 +16,22 @@ module Unifig
     end
 
     def local_value
-      @local_value ||= config.dig(:envs, env, :value) || config[:value]
+      @local_value ||= env_config(:value) || config[:value]
+    end
+
+    def required?
+      return @required if defined?(@required)
+
+      optional = env_config(:optional)
+      optional = config[:optional] if optional.nil?
+      optional = false if optional.nil?
+      @required = !optional
+    end
+
+    private
+
+    def env_config(key)
+      config.dig(:envs, env, key)
     end
   end
 end

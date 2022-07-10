@@ -12,4 +12,7 @@ module Unifig
 
   # Raised if there is no provider that matches the one given in the config.
   MissingProvider = Class.new(Error)
+
+  # Raised if a required var is blank.
+  MissingRequired = Class.new(Error)
 end

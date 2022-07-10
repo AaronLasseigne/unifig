@@ -64,6 +64,25 @@ module Unifig
       providers = Providers.list(@config.providers)
       return if providers.empty?
 
+      vars = vars_and_set_local
+
+      providers.each do |provider|
+        vars = fetch_and_set_methods(provider, vars)
+      end
+
+      required_vars, optional_vars = vars.values.partition(&:required?)
+      if required_vars.any?
+        raise MissingRequired, <<~MSG
+          Missing Required Vars: #{required_vars.map(&:name).join(', ')}
+        MSG
+      end
+
+      attach_optional_methods(optional_vars)
+    end
+
+    private
+
+    def vars_and_set_local
       vars = {}
       local_values = {}
       @yml.each do |name, local_config|
@@ -73,21 +92,34 @@ module Unifig
         local_values[name] = vars[name].local_value
       end
       Unifig::Providers::Local.load(local_values)
-
-      providers.each do |provider|
-        values = provider.retrieve(vars.keys)
-        values.each do |name, value|
-          attach_method(vars[name], value)
-        end
-        vars = vars.except(*values.keys)
-      end
+      vars
     end
 
-    private
+    def fetch_and_set_methods(provider, vars)
+      values = provider.retrieve(vars.keys)
+      values.each do |name, value|
+        attach_method(vars[name], value)
+        attach_predicate(vars[name], true)
+      end
+      vars.except(*values.keys)
+    end
+
+    def attach_optional_methods(vars)
+      vars.each do |var|
+        attach_method(var, nil)
+        attach_predicate(var, false)
+      end
+    end
 
     def attach_method(var, value)
       Unifig.define_singleton_method(var.method) do
         value
+      end
+    end
+
+    def attach_predicate(var, bool)
+      Unifig.define_singleton_method(:"#{var.method}?") do
+        bool
       end
     end
   end

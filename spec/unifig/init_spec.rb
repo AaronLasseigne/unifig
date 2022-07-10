@@ -81,6 +81,99 @@ RSpec.describe Unifig::Init do
         expect(Unifig.bar).to eql 'bar'
       end
     end
+
+    context 'with an optional var' do
+      before { load }
+
+      context 'that is available' do
+        let(:str) do
+          <<~YML
+            config:
+              envs:
+                development:
+                  providers: local
+
+            FOO_BAR:
+              optional: true
+              value: baz
+          YML
+        end
+
+        it 'loads the var' do
+          expect(Unifig.foo_bar).to eql 'baz'
+        end
+
+        it 'sets the predicate to true' do
+          expect(Unifig).to be_foo_bar
+        end
+      end
+
+      context 'that is not available' do
+        let(:str) do
+          <<~YML
+            config:
+              envs:
+                development:
+                  providers: local
+
+            FOO_BAR:
+              optional: true
+          YML
+        end
+
+        it 'makes the var nil' do
+          expect(Unifig.foo_bar).to be_nil
+        end
+
+        it 'sets the predicate to false' do
+          expect(Unifig).to_not be_foo_bar
+        end
+      end
+    end
+
+    context 'with a required var' do
+      context 'that is available' do
+        before { load }
+
+        let(:str) do
+          <<~YML
+            config:
+              envs:
+                development:
+                  providers: local
+
+            FOO_BAR:
+              value: baz
+          YML
+        end
+
+        it 'loads the var' do
+          expect(Unifig.foo_bar).to eql 'baz'
+        end
+
+        it 'sets the predicate to true' do
+          expect(Unifig).to be_foo_bar
+        end
+      end
+
+      context 'that is not available' do
+        let(:str) do
+          <<~YML
+            config:
+              envs:
+                development:
+                  providers: local
+
+            FOO_BAR:
+              value:
+          YML
+        end
+
+        it 'throws an error' do
+          expect { load }.to raise_error Unifig::MissingRequired
+        end
+      end
+    end
   end
 
   describe '.load_file' do

@@ -50,4 +50,42 @@ RSpec.describe Unifig::Var do
       end
     end
   end
+
+  describe '#required?' do
+    context 'with no value' do
+      it 'returns true' do
+        expect(var).to be_required
+      end
+    end
+
+    context 'with a top level value' do
+      let(:value) { 'value' }
+      let(:config) do
+        {
+          optional: true
+        }
+      end
+
+      it 'returns the value' do
+        expect(var).to_not be_required
+      end
+
+      context 'with an override' do
+        let(:config) do
+          {
+            optional: false,
+            envs: {
+              env => {
+                optional: true
+              }
+            }
+          }
+        end
+
+        it 'returns the override' do
+          expect(var).to_not be_required
+        end
+      end
+    end
+  end
 end
