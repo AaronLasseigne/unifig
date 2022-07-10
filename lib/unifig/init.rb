@@ -103,7 +103,7 @@ module Unifig
         attach_method(vars[name], value)
         attach_predicate(vars[name], true)
       end
-      vars.except(*values.keys)
+      vars.slice(*(vars.keys - values.keys)) # switch to except after 2.7
     end
 
     def blank_string?(value)
