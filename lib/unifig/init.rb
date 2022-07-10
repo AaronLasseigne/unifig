@@ -98,10 +98,16 @@ module Unifig
     def fetch_and_set_methods(provider, vars)
       values = provider.retrieve(vars.keys)
       values.each do |name, value|
+        next values.delete(name) if blank_string?(value)
+
         attach_method(vars[name], value)
         attach_predicate(vars[name], true)
       end
       vars.except(*values.keys)
+    end
+
+    def blank_string?(value)
+      value.respond_to?(:to_str) && value.to_str.strip.empty?
     end
 
     def attach_optional_methods(vars)

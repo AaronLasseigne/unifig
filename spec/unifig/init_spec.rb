@@ -129,6 +129,29 @@ RSpec.describe Unifig::Init do
           expect(Unifig).to_not be_foo_bar
         end
       end
+
+      context 'that is not blank' do
+        let(:str) do
+          <<~YML
+            config:
+              envs:
+                development:
+                  providers: local
+
+            FOO_BAR:
+              optional: true
+              value: ' '
+          YML
+        end
+
+        it 'makes the var nil' do
+          expect(Unifig.foo_bar).to be_nil
+        end
+
+        it 'sets the predicate to false' do
+          expect(Unifig).to_not be_foo_bar
+        end
+      end
     end
 
     context 'with a required var' do
@@ -166,6 +189,24 @@ RSpec.describe Unifig::Init do
 
             FOO_BAR:
               value:
+          YML
+        end
+
+        it 'throws an error' do
+          expect { load }.to raise_error Unifig::MissingRequired
+        end
+      end
+
+      context 'that is blank' do
+        let(:str) do
+          <<~YML
+            config:
+              envs:
+                development:
+                  providers: local
+
+            FOO_BAR:
+              value: ' '
           YML
         end
 
