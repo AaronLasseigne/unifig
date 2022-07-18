@@ -109,10 +109,10 @@ A [complete list of contributors][] is available on GitHub.
 Unifig is licensed under [the MIT License][].
 
 [Unifig]: https://github.com/AaronLasseigne/unifig
-[semantic versioning]: http://semver.org/spec/v2.0.0.html
+[Semantic Versioning]: http://semver.org/spec/v2.0.0.html
 [GitHub releases]: https://github.com/AaronLasseigne/unifig/releases
 [YAML configuration]: #yaml-configuration
 [API Documentation]: http://rubydoc.info/github/AaronLasseigne/unifig
 [our contribution guidelines]: CONTRIBUTING.md
 [complete list of contributors]: https://github.com/AaronLasseigne/unifig/graphs/contributors
-[the mit license]: LICENSE.txt
+[the MIT License]: LICENSE.txt
