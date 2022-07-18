@@ -1,5 +1,7 @@
 # Contributing
 
+For features please open a [discussion][] and we can make sure the feature fits with the gem before working on it.
+
 ## Steps
 
 1. [Fork][] the repo.
