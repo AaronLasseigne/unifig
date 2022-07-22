@@ -2,11 +2,8 @@
 
 module Unifig
   module Providers
-    # A provider to retrieve values from the unifig.yml file.
+    # @private
     module Local
-      # Returns the name of the provider.
-      #
-      # @return [Symbol]
       def self.name
         :local
       end
