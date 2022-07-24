@@ -13,6 +13,16 @@ RSpec.describe Unifig::Config do
     }
   end
 
+  describe '#new' do
+    context 'without a config' do
+      let(:config_hash) { nil }
+
+      it 'raises an error' do
+        expect { config }.to raise_error Unifig::MissingConfigError
+      end
+    end
+  end
+
   describe '#providers' do
     it 'returns a list of providers for the selected env' do
       expect(config.providers).to eql %i[local]

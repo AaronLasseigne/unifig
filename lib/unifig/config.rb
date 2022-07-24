@@ -3,7 +3,10 @@
 module Unifig
   # @private
   class Config
+    # @raise [MissingConfigError] - No config section was provided.
     def initialize(config, env: nil)
+      raise MissingConfigError, 'You must provide a configuration' unless config
+
       @env_config = config.slice(:providers)
       @env = env
 

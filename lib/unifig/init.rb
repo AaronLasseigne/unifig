@@ -48,14 +48,11 @@ module Unifig
 
       private
 
-      # @raise [MissingConfigError] - No config section was provided in the YAML.
       # @raise [MissingRequiredError] - One or more required variables are missing values.
+      # @raise (see Unifig::Config#initialize)
       # @raise (see Unifig::Providers.list)
       def exec!(yml, env: nil)
-        config_hash = yml.delete(:config)
-        raise MissingConfigError unless config_hash
-
-        config = Config.new(config_hash, env: env)
+        config = Config.new(yml.delete(:config), env: env)
 
         providers = Providers.list(config.providers)
         return if providers.empty?

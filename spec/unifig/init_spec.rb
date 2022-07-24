@@ -17,20 +17,7 @@ RSpec.shared_examples 'basic load tests' do
     end
   end
 
-  context 'without a config' do
-    let(:str) do
-      <<~YML
-        ONE:
-          value: 1
-      YML
-    end
-
-    it 'throws an error' do
-      expect { subject }.to raise_error Unifig::MissingConfigError
-    end
-  end
-
-  context 'with a config' do
+  context 'with a valid config' do
     let(:str) do
       <<~YML
         config:
