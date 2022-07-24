@@ -4,131 +4,123 @@ require 'yaml'
 
 module Unifig
   # Initializes Unifig with methods based on YAML.
-  class Init
-    # Loads a string of YAML to configure Unifig.
-    #
-    # @example
-    #   Unifig::Init.load(<<~YML, env: :development)
-    #     config:
-    #       envs:
-    #         development:
-    #           providers: local
-    #
-    #     FOO_BAR:
-    #       value: "baz"
-    #   YML
-    #
-    # @param str [String] A YAML config.
-    # @param env [Symbol] An environment name to load.
-    #
-    # @raise [YAMLSyntaxError] - Invalid YAML
-    # @raise (see #initialize)
-    # @raise (see #exec!)
-    def self.load(str, env: nil)
-      yml = Psych.load(str, symbolize_names: true)
-      new(yml, env: env).exec!
-    rescue Psych::SyntaxError, Psych::BadAlias => e
-      raise YAMLSyntaxError, e.message
-    end
-
-    # Loads a YAML file to configure Unifig.
-    #
-    # @example
-    #   Unifig::Init.load_file('config.yml', env: :development)
-    #
-    # @param file_path [String] The path to a YAML config file.
-    # @param env [Symbol] An environment name to load.
-    #
-    # @raise (see Unifig::Init.load)
-    def self.load_file(file_path, env: nil)
-      # Ruby 2.7 Psych.load_file doesn't support the :symbolize_names flag.
-      # After Ruby 2.7 this can be changed to Psych.load_file if that's faster.
-      load(File.read(file_path), env: env)
-    end
-
-    # @private
-    #
-    # @raise [MissingConfigError] - No config section was provided in the YAML.
-    def initialize(yml, env: nil)
-      @yml = yml
-      @env = env
-
-      config = @yml.delete(:config)
-      raise MissingConfigError unless config
-
-      @config = Config.new(config, env: @env)
-    end
-
-    # @private
-    #
-    # @raise (see Unifig::Providers.list)
-    # @raise [MissingRequiredError] - One or more required variables are missing values.
-    def exec!
-      providers = Providers.list(@config.providers)
-      return if providers.empty?
-
-      vars = vars_and_set_local
-
-      providers.each do |provider|
-        vars = fetch_and_set_methods(provider, vars)
+  module Init
+    class << self
+      # Loads a string of YAML to configure Unifig.
+      #
+      # @example
+      #   Unifig::Init.load(<<~YML, env: :development)
+      #     config:
+      #       envs:
+      #         development:
+      #           providers: local
+      #
+      #     FOO_BAR:
+      #       value: "baz"
+      #   YML
+      #
+      # @param str [String] A YAML config.
+      # @param env [Symbol] An environment name to load.
+      #
+      # @raise [YAMLSyntaxError] - Invalid YAML
+      # @raise (see .exec!)
+      def load(str, env: nil)
+        yml = Psych.load(str, symbolize_names: true)
+        exec!(yml, env: env)
+      rescue Psych::SyntaxError, Psych::BadAlias => e
+        raise YAMLSyntaxError, e.message
       end
 
-      required_vars, optional_vars = vars.values.partition(&:required?)
-      if required_vars.any?
-        raise MissingRequiredError, <<~MSG
-          Missing Required Vars: #{required_vars.map(&:name).join(', ')}
-        MSG
+      # Loads a YAML file to configure Unifig.
+      #
+      # @example
+      #   Unifig::Init.load_file('config.yml', env: :development)
+      #
+      # @param file_path [String] The path to a YAML config file.
+      # @param env [Symbol] An environment name to load.
+      #
+      # @raise (see Unifig::Init.load)
+      def load_file(file_path, env: nil)
+        # Ruby 2.7 Psych.load_file doesn't support the :symbolize_names flag.
+        # After Ruby 2.7 this can be changed to Psych.load_file if that's faster.
+        load(File.read(file_path), env: env)
       end
 
-      attach_optional_methods(optional_vars)
-    end
+      private
 
-    private
+      # @raise [MissingConfigError] - No config section was provided in the YAML.
+      # @raise [MissingRequiredError] - One or more required variables are missing values.
+      # @raise (see Unifig::Providers.list)
+      def exec!(yml, env: nil)
+        config_hash = yml.delete(:config)
+        raise MissingConfigError unless config_hash
 
-    def vars_and_set_local
-      vars = {}
-      local_values = {}
-      @yml.each do |name, local_config|
-        local_config = {} if local_config.nil?
+        config = Config.new(config_hash, env: env)
 
-        vars[name] = Var.new(name, local_config, @env)
-        local_values[name] = vars[name].local_value
+        providers = Providers.list(config.providers)
+        return if providers.empty?
+
+        vars = vars_and_set_local(yml, env)
+
+        providers.each do |provider|
+          vars = fetch_and_set_methods(provider, vars)
+        end
+
+        required_vars, optional_vars = vars.values.partition(&:required?)
+        if required_vars.any?
+          raise MissingRequiredError, <<~MSG
+            Missing Required Vars: #{required_vars.map(&:name).join(', ')}
+          MSG
+        end
+
+        attach_optional_methods(optional_vars)
       end
-      Unifig::Providers::Local.load(local_values)
-      vars
-    end
 
-    def fetch_and_set_methods(provider, vars)
-      values = provider.retrieve(vars.keys)
-      values.each do |name, value|
-        next values.delete(name) if blank_string?(value)
+      def vars_and_set_local(yml, env)
+        vars = {}
+        local_values = {}
+        yml.each do |name, local_config|
+          local_config = {} if local_config.nil?
 
-        attach_method(vars[name], value)
-        attach_predicate(vars[name], true)
+          vars[name] = Var.new(name, local_config, env)
+          local_values[name] = vars[name].local_value
+        end
+        Unifig::Providers::Local.load(local_values)
+        vars
       end
-      vars.slice(*(vars.keys - values.keys)) # switch to except after 2.7
-    end
 
-    def blank_string?(value)
-      value.respond_to?(:to_str) && value.to_str.strip.empty?
-    end
+      def fetch_and_set_methods(provider, vars)
+        values = provider.retrieve(vars.keys)
+        values.each do |name, value|
+          next values.delete(name) if blank_string?(value)
 
-    def attach_optional_methods(vars)
-      vars.each do |var|
-        attach_method(var, nil)
-        attach_predicate(var, false)
+          attach_method(vars[name], value)
+          attach_predicate(vars[name], true)
+        end
+        vars.slice(*(vars.keys - values.keys)) # switch to except after 2.7
       end
-    end
 
-    def attach_method(var, value)
-      Unifig.define_singleton_method(var.method) do
-        value
+      def blank_string?(value)
+        value.respond_to?(:to_str) && value.to_str.strip.empty?
       end
-    end
 
-    def attach_predicate(var, bool)
-      Unifig.define_singleton_method(:"#{var.method}?") do
-        bool
+      def attach_optional_methods(vars)
+        vars.each do |var|
+          attach_method(var, nil)
+          attach_predicate(var, false)
+        end
+      end
+
+      def attach_method(var, value)
+        Unifig.define_singleton_method(var.method) do
+          value
+        end
+      end
+
+      def attach_predicate(var, bool)
+        Unifig.define_singleton_method(:"#{var.method}?") do
+          bool
+        end
       end
     end
   end
