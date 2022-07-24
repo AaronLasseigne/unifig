@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
   spec.authors = ['Aaron Lasseigne']
   spec.email = ['aaron.lasseigne@gmail.com']
 
-  spec.summary = 'A way to load external variables from one or more sources (e.g. ENV).'
+  spec.summary = 'A pluggable system for loading external variables from one or more providers (e.g. ENV).'
   spec.description = spec.summary
   spec.homepage = 'https://github.com/AaronLasseigne/unifig'
 
