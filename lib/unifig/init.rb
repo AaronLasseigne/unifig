@@ -23,7 +23,6 @@ module Unifig
     #
     # @raise [YAMLSyntaxError] - Invalid YAML
     # @raise (see #initialize)
-    # @raise (see Unifig::Providers.list)
     # @raise (see #exec!)
     def self.load(str, env: nil)
       yml = Psych.load(str, symbolize_names: true)
@@ -62,6 +61,7 @@ module Unifig
 
     # @private
     #
+    # @raise (see Unifig::Providers.list)
     # @raise [MissingRequiredError] - One or more required variables are missing values.
     def exec!
       providers = Providers.list(@config.providers)
