@@ -139,9 +139,10 @@ This is the case for the overall configuration as well as any variable configura
 
 ### Providers
 
-| Provider | Gem      |
-| -------- | -------- |
-| Local    | Built-in |
+| Provider | Gem            |
+| -------- | -------------- |
+| Local    | Built-in       |
+| ENV      | [unifig-env][] |
 
 ## Contributing
 
@@ -159,5 +160,6 @@ Unifig is licensed under [the MIT License][].
 [YAML configuration]: #yaml-configuration
 [API Documentation]: http://rubydoc.info/github/AaronLasseigne/unifig
 [our contribution guidelines]: CONTRIBUTING.md
+[unifig-env]: https://github.com/AaronLasseigne/unifig-env
 [complete list of contributors]: https://github.com/AaronLasseigne/unifig/graphs/contributors
 [the MIT License]: LICENSE.txt
