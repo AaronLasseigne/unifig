@@ -8,9 +8,19 @@ module Unifig
       return all if providers.nil?
 
       providers.map do |provider|
-        all.detect { |pp| pp.name == provider }.tap do |found|
-          raise MissingProvider, %("#{provider}" is not in the list of available providers) unless found
-        end
+        all
+          .detect { |pp| pp.name == provider }
+          .tap do |found|
+            unless found
+              msg = %("#{provider}" is not in the list of available providers)
+
+              dym = DidYouMean::SpellChecker.new(dictionary: all.map(&:name))
+              correction = dym.correct(provider).first
+              msg += "\nDid you mean? #{correction}" if correction
+
+              raise MissingProvider, msg
+            end
+          end
       end
     end
 

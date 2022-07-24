@@ -32,5 +32,13 @@ RSpec.describe Unifig::Providers do
       list = described_class.list([Unifig::Providers::FortyTwo.name, Unifig::Providers::Local.name])
       expect(list).to eql [Unifig::Providers::FortyTwo, Unifig::Providers::Local]
     end
+
+    context 'with an invalid provider' do
+      it 'raises an error' do
+        expect do
+          described_class.list([Unifig::Providers::Local.name, :invalid])
+        end.to raise_error Unifig::MissingProvider
+      end
+    end
   end
 end
