@@ -38,13 +38,9 @@ They can be made optional using the `:optional` setting.
 If there is a required variable without a value, Unifig will throw an error when loading.
 
 ``` rb
-Unifig::Init.load(<<~YAML, :production)
+Unifig::Init.load(<<~YAML, env: :production)
   config:
-    envs:
-      development:
-        providers: local
-      production:
-        providers: local
+    providers: local
 
   HOST:
     value: github.com

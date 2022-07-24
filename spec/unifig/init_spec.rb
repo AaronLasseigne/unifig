@@ -20,8 +20,8 @@ RSpec.shared_examples 'basic load tests' do
   context 'without a config' do
     let(:str) do
       <<~YML
-        FOO_BAR:
-          value: "baz"
+        ONE:
+          value: 1
       YML
     end
 
@@ -34,20 +34,18 @@ RSpec.shared_examples 'basic load tests' do
     let(:str) do
       <<~YML
         config:
-          envs:
-            development:
-              providers: local
+          providers: local
 
-        FOO_BAR:
-          value: baz
+        ONE:
+          value: 1
       YML
     end
 
     it 'loads up a string of yaml' do
       subject
 
-      expect(Unifig).to respond_to(:foo_bar)
-      expect(Unifig.foo_bar).to eql 'baz'
+      expect(Unifig).to respond_to(:one)
+      expect(Unifig.one).to be 1
     end
   end
 end
@@ -56,7 +54,7 @@ RSpec.describe Unifig::Init do
   let(:env) { :development }
 
   describe '.load' do
-    subject(:load) { described_class.load(str, env) }
+    subject(:load) { described_class.load(str, env: env) }
 
     include_examples 'basic load tests'
 
@@ -64,21 +62,19 @@ RSpec.describe Unifig::Init do
       let(:str) do
         <<~YML
           config:
-            envs:
-              development:
-                providers: [local, forty_two]
+            providers: [local, forty_two]
 
-          FOO:
-          BAR:
-            value: bar
+          ONE:
+          TWO:
+            value: 2
         YML
       end
 
       it 'returns the values from the providers in order' do
         load
 
-        expect(Unifig.foo).to be 42
-        expect(Unifig.bar).to eql 'bar'
+        expect(Unifig.one).to be 42
+        expect(Unifig.two).to be 2
       end
     end
 
@@ -89,22 +85,20 @@ RSpec.describe Unifig::Init do
         let(:str) do
           <<~YML
             config:
-              envs:
-                development:
-                  providers: local
+              providers: local
 
-            FOO_BAR:
+            ONE:
               optional: true
-              value: baz
+              value: 1
           YML
         end
 
         it 'loads the var' do
-          expect(Unifig.foo_bar).to eql 'baz'
+          expect(Unifig.one).to be 1
         end
 
         it 'sets the predicate to true' do
-          expect(Unifig).to be_foo_bar
+          expect(Unifig).to be_one
         end
       end
 
@@ -112,21 +106,19 @@ RSpec.describe Unifig::Init do
         let(:str) do
           <<~YML
             config:
-              envs:
-                development:
-                  providers: local
+              providers: local
 
-            FOO_BAR:
+            ONE:
               optional: true
           YML
         end
 
         it 'makes the var nil' do
-          expect(Unifig.foo_bar).to be_nil
+          expect(Unifig.one).to be_nil
         end
 
         it 'sets the predicate to false' do
-          expect(Unifig).to_not be_foo_bar
+          expect(Unifig).to_not be_one
         end
       end
 
@@ -134,22 +126,20 @@ RSpec.describe Unifig::Init do
         let(:str) do
           <<~YML
             config:
-              envs:
-                development:
-                  providers: local
+              providers: local
 
-            FOO_BAR:
+            ONE:
               optional: true
               value: ' '
           YML
         end
 
         it 'makes the var nil' do
-          expect(Unifig.foo_bar).to be_nil
+          expect(Unifig.one).to be_nil
         end
 
         it 'sets the predicate to false' do
-          expect(Unifig).to_not be_foo_bar
+          expect(Unifig).to_not be_one
         end
       end
     end
@@ -161,21 +151,19 @@ RSpec.describe Unifig::Init do
         let(:str) do
           <<~YML
             config:
-              envs:
-                development:
-                  providers: local
+              providers: local
 
-            FOO_BAR:
-              value: baz
+            ONE:
+              value: 1
           YML
         end
 
         it 'loads the var' do
-          expect(Unifig.foo_bar).to eql 'baz'
+          expect(Unifig.one).to be 1
         end
 
         it 'sets the predicate to true' do
-          expect(Unifig).to be_foo_bar
+          expect(Unifig).to be_one
         end
       end
 
@@ -183,11 +171,9 @@ RSpec.describe Unifig::Init do
         let(:str) do
           <<~YML
             config:
-              envs:
-                development:
-                  providers: local
+              providers: local
 
-            FOO_BAR:
+            ONE:
               value:
           YML
         end
@@ -201,11 +187,9 @@ RSpec.describe Unifig::Init do
         let(:str) do
           <<~YML
             config:
-              envs:
-                development:
-                  providers: local
+              providers: local
 
-            FOO_BAR:
+            ONE:
               value: ' '
           YML
         end
@@ -218,7 +202,7 @@ RSpec.describe Unifig::Init do
   end
 
   describe '.load_file' do
-    subject(:load_file) { described_class.load_file(file_path, env) }
+    subject(:load_file) { described_class.load_file(file_path, env: env) }
 
     let(:file) do
       Tempfile.new(%w[test .yml]).tap do |file|

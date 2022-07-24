@@ -8,7 +8,7 @@ module Unifig
     # Loads a string of YAML to configure Unifig.
     #
     # @example
-    #   Unifig::Init.load(<<~YML, :development)
+    #   Unifig::Init.load(<<~YML, env: :development)
     #     config:
     #       envs:
     #         development:
@@ -24,9 +24,9 @@ module Unifig
     # @raise [YAMLSyntaxError] - Invalid YAML
     # @raise (see #initialize)
     # @raise (see Unifig::Providers.list)
-    def self.load(str, env)
+    def self.load(str, env: nil)
       yml = Psych.load(str, symbolize_names: true)
-      new(yml, env).exec!
+      new(yml, env: env).exec!
     rescue Psych::SyntaxError, Psych::BadAlias => e
       raise YAMLSyntaxError, e.message
     end
@@ -34,29 +34,29 @@ module Unifig
     # Loads a YAML file to configure Unifig.
     #
     # @example
-    #   Unifig::Init.load_file('config.yml', :development)
+    #   Unifig::Init.load_file('config.yml', env: :development)
     #
     # @param file_path [String] The path to a YAML config file.
     # @param env [Symbol] An environment name to load.
     #
     # @raise (see Unifig::Init.load)
-    def self.load_file(file_path, env)
+    def self.load_file(file_path, env: nil)
       # Ruby 2.7 Psych.load_file doesn't support the :symbolize_names flag.
       # After Ruby 2.7 this can be changed to Psych.load_file if that's faster.
-      load(File.read(file_path), env)
+      load(File.read(file_path), env: env)
     end
 
     # @private
     #
     # @raise [MissingConfig] - No config section was provided in the YAML.
-    def initialize(yml, env)
+    def initialize(yml, env: nil)
       @yml = yml
       @env = env
 
       config = @yml.delete(:config)
       raise MissingConfig unless config
 
-      @config = Config.new(config, @env)
+      @config = Config.new(config, env: @env)
     end
 
     # @private
