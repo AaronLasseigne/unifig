@@ -1,4 +1,6 @@
-# [0.2.0][] (TBD)
+# [0.2.0][] (2022-07-24)
+
+## Changed
 
 - An environment is no longer required.
 
