@@ -9,13 +9,13 @@ module Unifig
       end
 
       # @private
-      def self.load(data)
-        @data = data
+      def self.load(vars)
+        @vars = vars
       end
 
       def self.retrieve(var_names)
         var_names.to_h do |name|
-          [name, @data[name]]
+          [name, @vars[name].local_value]
         end
       end
     end

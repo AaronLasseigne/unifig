@@ -57,7 +57,8 @@ module Unifig
         providers = Providers.list(config.providers)
         return if providers.empty?
 
-        vars = vars_and_set_local(yml, env)
+        vars = Var.generate(yml, env)
+        Unifig::Providers::Local.load(vars) if providers.include?(Providers::Local)
 
         providers.each do |provider|
           vars = fetch_and_set_methods(provider, vars)
@@ -71,19 +72,6 @@ module Unifig
         end
 
         attach_optional_methods(optional_vars)
-      end
-
-      def vars_and_set_local(yml, env)
-        vars = {}
-        local_values = {}
-        yml.each do |name, local_config|
-          local_config = {} if local_config.nil?
-
-          vars[name] = Var.new(name, local_config, env)
-          local_values[name] = vars[name].local_value
-        end
-        Unifig::Providers::Local.load(local_values)
-        vars
       end
 
       def fetch_and_set_methods(provider, vars)

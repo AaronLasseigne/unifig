@@ -3,6 +3,12 @@
 module Unifig
   # @private
   class Var
+    def self.generate(yml, env)
+      yml.to_h do |name, config|
+        [name, Var.new(name, config || {}, env)]
+      end
+    end
+
     def initialize(name, config, env)
       @name = name
       @config = config
