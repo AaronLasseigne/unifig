@@ -1,3 +1,7 @@
+# [0.2.1][] (TBD)
+
+- Raise an error if a two or more variable names result in the same method name.
+
 # [0.2.0][] (2022-07-24)
 
 ## Changed

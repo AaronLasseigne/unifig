@@ -3,10 +3,23 @@
 module Unifig
   # @private
   class Var
+    # @raise [DuplicateNameError] - A variable produces a duplicate method name.
     def self.generate(yml, env)
-      yml.to_h do |name, config|
+      vars = yml.to_h do |name, config|
         [name, Var.new(name, config || {}, env)]
       end
+
+      vars
+        .values
+        .group_by(&:method)
+        .each do |method_name, list|
+          next unless list.size > 1
+
+          names = list.map { |var| %("#{var.name}") }.join(', ')
+          raise DuplicateNameError, %(Variables #{names} result in the the same method name (Unifig.#{method_name})})
+        end
+
+      vars
     end
 
     def initialize(name, config, env)

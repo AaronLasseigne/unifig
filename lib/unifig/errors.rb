@@ -15,4 +15,7 @@ module Unifig
 
   # Raised if a required var is blank.
   MissingRequiredError = Class.new(Error)
+
+  # Raise if a variable produces a duplicate method name.
+  DuplicateNameError = Class.new(Error)
 end

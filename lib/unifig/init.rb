@@ -51,6 +51,7 @@ module Unifig
       # @raise [MissingRequiredError] - One or more required variables are missing values.
       # @raise (see Unifig::Config#initialize)
       # @raise (see Unifig::Providers.list)
+      # @raise (see Unifig::Var.generate)
       def exec!(yml, env: nil)
         config = Config.new(yml.delete(:config), env: env)
 
