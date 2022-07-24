@@ -8,11 +8,11 @@ module Unifig
   YAMLSyntaxError = Class.new(Error)
 
   # Raised if there is no config at the start of the YAML.
-  MissingConfig = Class.new(Error)
+  MissingConfigError = Class.new(Error)
 
   # Raised if there is no provider that matches the one given in the config.
-  MissingProvider = Class.new(Error)
+  MissingProviderError = Class.new(Error)
 
   # Raised if a required var is blank.
-  MissingRequired = Class.new(Error)
+  MissingRequiredError = Class.new(Error)
 end

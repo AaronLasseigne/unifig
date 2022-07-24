@@ -26,7 +26,7 @@ RSpec.shared_examples 'basic load tests' do
     end
 
     it 'throws an error' do
-      expect { subject }.to raise_error Unifig::MissingConfig
+      expect { subject }.to raise_error Unifig::MissingConfigError
     end
   end
 
@@ -179,7 +179,7 @@ RSpec.describe Unifig::Init do
         end
 
         it 'throws an error' do
-          expect { load }.to raise_error Unifig::MissingRequired
+          expect { load }.to raise_error Unifig::MissingRequiredError
         end
       end
 
@@ -195,7 +195,7 @@ RSpec.describe Unifig::Init do
         end
 
         it 'throws an error' do
-          expect { load }.to raise_error Unifig::MissingRequired
+          expect { load }.to raise_error Unifig::MissingRequiredError
         end
       end
     end

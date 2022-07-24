@@ -24,6 +24,7 @@ module Unifig
     # @raise [YAMLSyntaxError] - Invalid YAML
     # @raise (see #initialize)
     # @raise (see Unifig::Providers.list)
+    # @raise (see #exec!)
     def self.load(str, env: nil)
       yml = Psych.load(str, symbolize_names: true)
       new(yml, env: env).exec!
@@ -48,18 +49,20 @@ module Unifig
 
     # @private
     #
-    # @raise [MissingConfig] - No config section was provided in the YAML.
+    # @raise [MissingConfigError] - No config section was provided in the YAML.
     def initialize(yml, env: nil)
       @yml = yml
       @env = env
 
       config = @yml.delete(:config)
-      raise MissingConfig unless config
+      raise MissingConfigError unless config
 
       @config = Config.new(config, env: @env)
     end
 
     # @private
+    #
+    # @raise [MissingRequiredError] - One or more required variables are missing values.
     def exec!
       providers = Providers.list(@config.providers)
       return if providers.empty?
@@ -72,7 +75,7 @@ module Unifig
 
       required_vars, optional_vars = vars.values.partition(&:required?)
       if required_vars.any?
-        raise MissingRequired, <<~MSG
+        raise MissingRequiredError, <<~MSG
           Missing Required Vars: #{required_vars.map(&:name).join(', ')}
         MSG
       end

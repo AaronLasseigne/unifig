@@ -37,7 +37,7 @@ RSpec.describe Unifig::Providers do
       it 'raises an error' do
         expect do
           described_class.list([Unifig::Providers::Local.name, :invalid])
-        end.to raise_error Unifig::MissingProvider
+        end.to raise_error Unifig::MissingProviderError
       end
     end
   end

@@ -3,7 +3,7 @@
 module Unifig
   # @private
   module Providers
-    # @raise [MissingProvider] - The given provider is not in the list of available providers.
+    # @raise [MissingProviderError] - The given provider is not in the list of available providers.
     def self.list(providers = nil)
       return all if providers.nil?
 
@@ -18,7 +18,7 @@ module Unifig
               correction = dym.correct(provider).first
               msg += "\nDid you mean? #{correction}" if correction
 
-              raise MissingProvider, msg
+              raise MissingProviderError, msg
             end
           end
       end
