@@ -7,6 +7,14 @@ Unifig is a pluggable system for loading external variables from one or more pro
 
 ## Installation
 
+If you are using a framework you should install the associated gem:
+
+| Framework | Gem              |
+| --------- | ---------------- |
+| Rails     | [unifig-rails][] |
+
+If you want to use Unifig outside of a framework listed above you can manually add it to your project.
+
 Add it to your Gemfile:
 
 ``` rb
@@ -145,6 +153,7 @@ A [complete list of contributors][] is available on GitHub.
 Unifig is licensed under [the MIT License][].
 
 [Unifig]: https://github.com/AaronLasseigne/unifig
+[unifig-rails]: https://github.com/AaronLasseigne/unifig-rails
 [Semantic Versioning]: http://semver.org/spec/v2.0.0.html
 [GitHub releases]: https://github.com/AaronLasseigne/unifig/releases
 [YAML configuration]: #yaml-configuration
