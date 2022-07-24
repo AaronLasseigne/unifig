@@ -10,13 +10,13 @@ Unifig is a pluggable system for loading external variables from one or more pro
 Add it to your Gemfile:
 
 ``` rb
-gem 'unifig', '~> 0.1.0'
+gem 'unifig', '~> 0.2.0'
 ```
 
 Or install it manually:
 
 ``` sh
-$ gem install unifig --version '~> 0.1.0'
+$ gem install unifig --version '~> 0.2.0'
 ```
 
 This project uses [Semantic Versioning][].
