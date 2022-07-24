@@ -14,11 +14,9 @@ module Unifig
       end
 
       def self.retrieve(var_names)
-        local_values = var_names.to_h do |name|
+        var_names.to_h do |name|
           [name, @data[name]]
         end
-        local_values.compact!
-        local_values
       end
     end
   end

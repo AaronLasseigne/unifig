@@ -89,12 +89,12 @@ module Unifig
       def fetch_and_set_methods(provider, vars)
         values = provider.retrieve(vars.keys)
         values.each do |name, value|
-          next values.delete(name) if blank_string?(value)
+          next values.delete(name) if value.nil? || blank_string?(value)
 
           attach_method(vars[name], value)
           attach_predicate(vars[name], true)
         end
-        vars.slice(*(vars.keys - values.keys)) # switch to except after 2.7
+        vars.slice(*(vars.keys - values.keys)) # switch to except after Ruby 2.7
       end
 
       def blank_string?(value)
