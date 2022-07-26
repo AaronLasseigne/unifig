@@ -186,6 +186,104 @@ RSpec.describe Unifig::Init do
         end
       end
     end
+
+    context 'with substitutions' do
+      let(:str) do
+        <<~YML
+          config:
+            providers: local
+
+          NAME:
+            value: "world"
+          GREETING:
+            value: "Hello, ${NAME}!"
+        YML
+      end
+
+      it 'replaces the substitution' do
+        load
+
+        expect(Unifig.greeting).to eql 'Hello, world!'
+      end
+
+      context 'when they are out of order' do
+        let(:str) do
+          <<~YML
+            config:
+              providers: local
+
+            GREETING:
+              value: "Hello, ${NAME}!"
+            NAME:
+              value: "world"
+          YML
+        end
+
+        it 'replaces the substitution' do
+          load
+
+          expect(Unifig.greeting).to eql 'Hello, world!'
+        end
+      end
+
+      context 'when they chain' do
+        let(:str) do
+          <<~YML
+            config:
+              providers: local
+
+            INTRO:
+              value: "${GREETING} I'm Aaron."
+            NAME:
+              value: "world"
+            GREETING:
+              value: "Hello, ${NAME}!"
+          YML
+        end
+
+        it 'replaces the substitutions in order' do
+          load
+
+          expect(Unifig.intro).to eql "Hello, world! I'm Aaron."
+        end
+      end
+
+      context 'when they cause a cycle' do
+        let(:str) do
+          <<~YML
+            config:
+              providers: local
+
+            A:
+              value: "${B}"
+            B:
+              value: "${C}"
+            C:
+              value: "${A}"
+          YML
+        end
+
+        it 'raises an error' do
+          expect { load }.to raise_error Unifig::CyclicalSubstitutionError, 'cyclical dependency: A, B, C'
+        end
+      end
+
+      context 'when they do not exist' do
+        let(:str) do
+          <<~YML
+            config:
+              providers: local
+
+            A:
+              value: "${B}"
+          YML
+        end
+
+        it 'raises an error' do
+          expect { load }.to raise_error Unifig::MissingSubstitutionError
+        end
+      end
+    end
   end
 
   describe '.load_file' do

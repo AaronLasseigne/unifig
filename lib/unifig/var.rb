@@ -16,7 +16,7 @@ module Unifig
           next unless list.size > 1
 
           names = list.map { |var| %("#{var.name}") }.join(', ')
-          raise DuplicateNameError, %(Variables #{names} result in the the same method name (Unifig.#{method_name})})
+          raise DuplicateNameError, "variables all result in the same method name (Unifig.#{method_name}): #{names}"
         end
 
       vars

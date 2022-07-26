@@ -16,6 +16,12 @@ module Unifig
   # Raised if a required var is blank.
   MissingRequiredError = Class.new(Error)
 
-  # Raise if a variable produces a duplicate method name.
+  # Raised if a variable produces a duplicate method name.
   DuplicateNameError = Class.new(Error)
+
+  # Raised if substitutions result in a cyclical dependency.
+  CyclicalSubstitutionError = Class.new(Error)
+
+  # Raised if a substitution does not exist.
+  MissingSubstitutionError = Class.new(Error)
 end

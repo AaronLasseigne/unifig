@@ -21,6 +21,8 @@ Gem::Specification.new do |spec|
 
   spec.required_ruby_version = '>= 2.7.0'
 
+  spec.add_dependency 'tsort', '0.1.0'
+
   spec.files =
     %w[CHANGELOG.md CONTRIBUTING.md LICENSE.txt README.md] +
     Dir.glob(File.join('lib', '**', '*.rb'))

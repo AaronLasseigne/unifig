@@ -8,6 +8,7 @@
 
 - Raise an error if a two or more variable names result in the same method name.
 - Any `nil` values are now handled here so providers don't have to worry about it.
+- Variable substituion
 
 # [0.2.0][] (2022-07-24)
 

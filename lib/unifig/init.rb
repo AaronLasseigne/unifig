@@ -52,6 +52,7 @@ module Unifig
       # @raise (see Unifig::Config#initialize)
       # @raise (see Unifig::Providers.list)
       # @raise (see Unifig::Var.generate)
+      # @raise (see .complete_substitutions!)
       def exec!(yml, env: nil)
         config = Config.new(yml.delete(:config), env: env)
 
@@ -65,6 +66,8 @@ module Unifig
 
         check_required_vars(vars, values)
 
+        complete_substitutions!(values)
+
         attach_methods(vars.slice(*values.keys).values, values)
         attach_missing_optional_methods(vars.slice(*(vars.keys - values.keys)).values) # use except after Ruby 2.7
       end
@@ -72,7 +75,7 @@ module Unifig
       def fetch_from_providers(providers, var_names)
         remaining_vars = var_names
 
-        providers.each_with_object({}) do |provider, values|
+        providers.each_with_object(Values.new) do |provider, values|
           result = provider.retrieve(remaining_vars).reject do |_, value|
             value.nil? || blank_string?(value)
           end
@@ -93,8 +96,26 @@ module Unifig
         return if (required_var_names - values.keys).empty?
 
         raise MissingRequiredError, <<~MSG
-          Missing Required Vars: #{required_var_names.join(', ')}
+          variables without a value: #{required_var_names.join(', ')}
         MSG
+      end
+
+      # @raise [CyclicalSubstitutionError] - Subtitutions resulted in a cyclical dependency.
+      # @raise [MissingSubstitutionError] - A substitution does not exist.
+      def complete_substitutions!(values)
+        values.tsort.each do |name|
+          value = values[name]
+          next unless value.is_a?(String)
+
+          value.gsub!(/\${[^}]+}/) do |match|
+            name = match[2..-2].to_sym
+            values[name]
+          end
+        end
+      rescue TSort::Cyclic => e
+        names = e.message.scan(/:([^ \],]+)/).flatten
+
+        raise CyclicalSubstitutionError, "cyclical dependency: #{names.join(', ')}"
       end
 
       def attach_methods(vars, values)

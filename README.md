@@ -69,6 +69,17 @@ HELLO:
       value: "dlrow"
 ```
 
+### Variable Substitutions
+
+Variables can be used in other variables with `${VAR}`.
+
+```rb
+USER:
+SERVICE_USERNAME: "${USER}_at_service"
+```
+
+Order of the variables does not matter but cyclical dependencies will throw an error.
+
 ### Loading
 
 Loading a configuration is handled through the `Unifig::Init` class.
@@ -78,7 +89,7 @@ All variables are assumed to be required (not `nil` or a blank string).
 Variables can be made optional by using the `:optional` setting.
 If there is a required variable without a value, Unifig will throw an error when loading.
 
-``` rb
+```rb
 Unifig::Init.load(<<~YAML, env: :production)
   config:
     providers: local
@@ -107,7 +118,7 @@ YAML
 
 If we replaced `:development` with `:production` inside the `load` call we'd get:
 
-``` rb
+```rb
 > Unifig.host?
 # true
 > Unifig.host
@@ -120,7 +131,7 @@ If we replaced `:development` with `:production` inside the `load` call we'd get
 
 You can load from a configuration file by using `load_file`.
 
-``` rb
+```rb
 Unifig::Init.load_file('unifig.yml', env: :production)
 ```
 
