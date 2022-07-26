@@ -61,36 +61,45 @@ module Unifig
         vars = Var.generate(yml, env)
         Unifig::Providers::Local.load(vars) if providers.include?(Providers::Local)
 
-        providers.each do |provider|
-          vars = fetch_and_set_methods(provider, vars)
-        end
+        values = fetch_from_providers(providers, vars.keys)
 
-        required_vars, optional_vars = vars.values.partition(&:required?)
-        if required_vars.any?
+        required_vars = vars.values.select(&:required?)
+        required_var_names = required_vars.map(&:name)
+        if (required_var_names - values.keys).any?
           raise MissingRequiredError, <<~MSG
-            Missing Required Vars: #{required_vars.map(&:name).join(', ')}
+            Missing Required Vars: #{required_var_names.join(', ')}
           MSG
         end
 
-        attach_optional_methods(optional_vars)
+        attach_methods(vars.slice(*values.keys).values, values)
+        attach_missing_optional_methods(vars.slice(*(vars.keys - values.keys)).values) # use except after Ruby 2.7
       end
 
-      def fetch_and_set_methods(provider, vars)
-        values = provider.retrieve(vars.keys)
-        values.each do |name, value|
-          next values.delete(name) if value.nil? || blank_string?(value)
+      def fetch_from_providers(providers, var_names)
+        remaining_vars = var_names
 
-          attach_method(vars[name], value)
-          attach_predicate(vars[name], true)
+        providers.each_with_object({}) do |provider, values|
+          result = provider.retrieve(remaining_vars).reject do |_, value|
+            value.nil? || blank_string?(value)
+          end
+
+          values.merge!(result)
+          remaining_vars -= result.keys
         end
-        vars.slice(*(vars.keys - values.keys)) # switch to except after Ruby 2.7
       end
 
       def blank_string?(value)
         value.respond_to?(:to_str) && value.to_str.strip.empty?
       end
 
-      def attach_optional_methods(vars)
+      def attach_methods(vars, values)
+        vars.each do |var|
+          attach_method(var, values[var.name])
+          attach_predicate(var, true)
+        end
+      end
+
+      def attach_missing_optional_methods(vars)
         vars.each do |var|
           attach_method(var, nil)
           attach_predicate(var, false)
