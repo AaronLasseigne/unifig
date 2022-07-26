@@ -63,13 +63,7 @@ module Unifig
 
         values = fetch_from_providers(providers, vars.keys)
 
-        required_vars = vars.values.select(&:required?)
-        required_var_names = required_vars.map(&:name)
-        if (required_var_names - values.keys).any?
-          raise MissingRequiredError, <<~MSG
-            Missing Required Vars: #{required_var_names.join(', ')}
-          MSG
-        end
+        check_required_vars(vars, values)
 
         attach_methods(vars.slice(*values.keys).values, values)
         attach_missing_optional_methods(vars.slice(*(vars.keys - values.keys)).values) # use except after Ruby 2.7
@@ -90,6 +84,17 @@ module Unifig
 
       def blank_string?(value)
         value.respond_to?(:to_str) && value.to_str.strip.empty?
+      end
+
+      def check_required_vars(vars, values)
+        required_vars = vars.values.select(&:required?)
+        required_var_names = required_vars.map(&:name)
+
+        return if (required_var_names - values.keys).empty?
+
+        raise MissingRequiredError, <<~MSG
+          Missing Required Vars: #{required_var_names.join(', ')}
+        MSG
       end
 
       def attach_methods(vars, values)
