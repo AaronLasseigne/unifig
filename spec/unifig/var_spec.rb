@@ -25,6 +25,13 @@ RSpec.describe Unifig::Var do
 
       expect(var.value).to be_nil
     end
+
+    it 'freezes the value if no frozen' do
+      var.value = 'a'
+
+      expect(var.value).to eql 'a'
+      expect(var.value).to be_frozen
+    end
   end
 
   describe '#local_value' do

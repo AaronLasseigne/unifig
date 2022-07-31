@@ -60,7 +60,7 @@ RSpec.describe Unifig::Init do
       it 'returns the values from the providers in order' do
         load
 
-        expect(Unifig.one).to be 42
+        expect(Unifig.one).to eql '42'
         expect(Unifig.two).to be 2
       end
     end

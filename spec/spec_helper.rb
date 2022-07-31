@@ -43,7 +43,7 @@ RSpec.configure do |config|
 
           def self.retrieve(var_names)
             var_names.to_h do |var_name|
-              [var_name, 42]
+              [var_name, '42'.freeze]
             end
           end
         end

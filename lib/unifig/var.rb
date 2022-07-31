@@ -32,7 +32,9 @@ module Unifig
 
     # @private
     def value=(obj)
-      @value = blank?(obj) ? nil : obj
+      value = blank?(obj) ? nil : obj
+      value = value.dup.freeze unless value.frozen?
+      @value = value
     end
 
     # The name of the method this variable can be found using.

@@ -97,7 +97,7 @@ module Unifig
           var = Vars[name]
           next unless var.value.is_a?(String)
 
-          var.value.gsub!(/\${[^}]+}/) do |match|
+          var.value = var.value.gsub(/\${[^}]+}/) do |match|
             name = match[2..-2].to_sym
             Vars[name].value
           end
