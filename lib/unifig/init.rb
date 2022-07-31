@@ -51,7 +51,7 @@ module Unifig
       # @raise [MissingRequiredError] - One or more required variables are missing values.
       # @raise (see Unifig::Config#initialize)
       # @raise (see Unifig::Providers.list)
-      # @raise (see Unifig::Var.generate)
+      # @raise (see Unifig::Var.load!)
       # @raise (see .complete_substitutions!)
       def exec!(yml, env: nil)
         config = Config.new(yml.delete(:config), env: env)
@@ -59,57 +59,47 @@ module Unifig
         providers = Providers.list(config.providers)
         return if providers.empty?
 
-        vars = Var.generate(yml, env)
-        Unifig::Providers::Local.load(vars) if providers.include?(Providers::Local)
+        Vars.load!(yml, env)
 
-        values = fetch_from_providers(providers, vars.keys)
+        fetch_from_providers!(providers)
 
-        check_required_vars(vars, values)
+        check_required_vars
 
-        complete_substitutions!(values)
+        complete_substitutions!
 
-        attach_methods(vars.slice(*values.keys).values, values)
-        attach_missing_optional_methods(vars.slice(*(vars.keys - values.keys)).values) # use except after Ruby 2.7
+        missing_vars, vars = Vars.list.partition { |var| var.value.nil? }
+        attach_methods!(vars)
+        attach_missing_optional_methods!(missing_vars)
       end
 
-      def fetch_from_providers(providers, var_names)
-        remaining_vars = var_names
+      def fetch_from_providers!(providers)
+        providers.each do |provider|
+          remaining_vars = Vars.list.filter_map { |var| var.name if var.value.nil? }
+          result = provider.retrieve(remaining_vars)
 
-        providers.each_with_object(Values.new) do |provider, values|
-          result = provider.retrieve(remaining_vars).reject do |_, value|
-            value.nil? || blank_string?(value)
-          end
-
-          values.merge!(result)
-          remaining_vars -= result.keys
+          Vars.write_results!(result, provider)
         end
       end
 
-      def blank_string?(value)
-        value.respond_to?(:to_str) && value.to_str.strip.empty?
-      end
-
-      def check_required_vars(vars, values)
-        required_vars = vars.values.select(&:required?)
-        required_var_names = required_vars.map(&:name)
-
-        return if (required_var_names - values.keys).empty?
+      def check_required_vars
+        missing_required_vars = Vars.list.select { |var| var.required? && var.value.nil? }
+        return if missing_required_vars.empty?
 
         raise MissingRequiredError, <<~MSG
-          variables without a value: #{required_var_names.join(', ')}
+          variables without a value: #{missing_required_vars.map(&:name).join(', ')}
         MSG
       end
 
       # @raise [CyclicalSubstitutionError] - Subtitutions resulted in a cyclical dependency.
       # @raise [MissingSubstitutionError] - A substitution does not exist.
-      def complete_substitutions!(values)
-        values.tsort.each do |name|
-          value = values[name]
-          next unless value.is_a?(String)
+      def complete_substitutions!
+        Vars.tsort.each do |name|
+          var = Vars[name]
+          next unless var.value.is_a?(String)
 
-          value.gsub!(/\${[^}]+}/) do |match|
+          var.value.gsub!(/\${[^}]+}/) do |match|
             name = match[2..-2].to_sym
-            values[name]
+            Vars[name].value
           end
         end
       rescue TSort::Cyclic => e
@@ -118,27 +108,27 @@ module Unifig
         raise CyclicalSubstitutionError, "cyclical dependency: #{names.join(', ')}"
       end
 
-      def attach_methods(vars, values)
+      def attach_methods!(vars)
         vars.each do |var|
-          attach_method(var, values[var.name])
-          attach_predicate(var, true)
+          attach_method!(var)
+          attach_predicate!(var, true)
         end
       end
 
-      def attach_missing_optional_methods(vars)
+      def attach_missing_optional_methods!(vars)
         vars.each do |var|
-          attach_method(var, nil)
-          attach_predicate(var, false)
+          attach_method!(var)
+          attach_predicate!(var, false)
         end
       end
 
-      def attach_method(var, value)
+      def attach_method!(var)
         Unifig.define_singleton_method(var.method) do
-          value
+          var.value
         end
       end
 
-      def attach_predicate(var, bool)
+      def attach_predicate!(var, bool)
         Unifig.define_singleton_method(:"#{var.method}?") do
           bool
         end

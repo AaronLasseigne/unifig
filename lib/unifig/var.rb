@@ -1,48 +1,60 @@
 # frozen_string_literal: true
 
 module Unifig
-  # @private
+  # A variable created after loading a configuration.
   class Var
-    # @raise [DuplicateNameError] - A variable produces a duplicate method name.
-    def self.generate(yml, env)
-      vars = yml.to_h do |name, config|
-        [name, Var.new(name, config || {}, env)]
-      end
-
-      vars
-        .values
-        .group_by(&:method)
-        .each do |method_name, list|
-          next unless list.size > 1
-
-          names = list.map { |var| %("#{var.name}") }.join(', ')
-          raise DuplicateNameError, "variables all result in the same method name (Unifig.#{method_name}): #{names}"
-        end
-
-      vars
-    end
-
+    # @private
     def initialize(name, config, env)
       @name = name
       @config = config
       @env = env
+      @value = nil
+      @provider = nil
     end
 
-    attr_reader :name, :config, :env
+    # The variable name.
+    #
+    # @return [Symbol]
+    attr_reader :name
 
+    # The provider that supplied the value.
+    #
+    # @return [Symbol]
+    attr_reader :provider # rubocop:disable Style/BisectedAttrAccessor
+
+    # @private
+    attr_writer :provider # rubocop:disable Style/BisectedAttrAccessor
+
+    # The value of the variable.
+    #
+    # @return [Object]
+    attr_reader :value
+
+    # @private
+    def value=(obj)
+      @value = blank?(obj) ? nil : obj
+    end
+
+    # The name of the method this variable can be found using.
+    #
+    # @return [Symbol]
     def method
       @method ||= name.to_s.downcase.tr('-', '_').to_sym
     end
 
+    # @private
     def local_value
-      @local_value ||= env_config(:value) || config[:value]
+      @local_value ||= env_config(:value) || @config[:value]
     end
 
+    # Returns whether or not this is a required variable.
+    #
+    # @return [Boolean]
     def required?
       return @required if defined?(@required)
 
       optional = env_config(:optional)
-      optional = config[:optional] if optional.nil?
+      optional = @config[:optional] if optional.nil?
       optional = false if optional.nil?
       @required = !optional
     end
@@ -50,7 +62,11 @@ module Unifig
     private
 
     def env_config(key)
-      config.dig(:envs, env, key)
+      @config.dig(:envs, @env, key)
+    end
+
+    def blank?(value)
+      value.nil? || (value.respond_to?(:to_str) && value.to_str.strip.empty?)
     end
   end
 end

@@ -5,39 +5,25 @@ RSpec.describe Unifig::Var do
   let(:config) { {} }
   let(:env) { :development }
 
-  describe '.generate' do
-    it 'returns a hash of variable names to Vars' do
-      yml = {
-        one: nil,
-        two: nil
-      }
-
-      list = described_class.generate(yml, env)
-
-      expect(list.size).to be 2
-      expect(list).to have_key :one
-      expect(list[:one]).to be_an_instance_of(described_class)
-      expect(list).to have_key :two
-      expect(list[:two]).to be_an_instance_of(described_class)
-    end
-
-    context 'with a duplicate method name' do
-      it 'raises an error' do
-        yml = {
-          one: nil,
-          ONE: nil
-        }
-
-        expect { described_class.generate(yml, env) }.to raise_error Unifig::DuplicateNameError
-      end
-    end
-  end
-
   describe '#method' do
     let(:name) { :'A-B' }
 
     it 'lowercases and switches dashes to underscores' do
       expect(var.method).to be :a_b
+    end
+  end
+
+  describe '#value=' do
+    it 'writes the value' do
+      var.value = 'a'
+
+      expect(var.value).to eql 'a'
+    end
+
+    it 'write blank strings as nil' do
+      var.value = '   '
+
+      expect(var.value).to be_nil
     end
   end
 

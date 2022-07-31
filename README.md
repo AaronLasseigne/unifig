@@ -155,6 +155,11 @@ This is the case for the overall configuration as well as any variable configura
 | Local    | Built-in       |
 | ENV      | [unifig-env][] |
 
+### Unifig::Vars
+
+After loading the configuration you can use `Unifig::Vars` to check on what happened.
+It will return a list of `Unifig::Var`s with information such as which provider supplied the value.
+
 ## Contributing
 
 If you want to contribute to Unifig, please read [our contribution guidelines][].
