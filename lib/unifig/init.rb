@@ -77,7 +77,7 @@ module Unifig
           remaining_vars = Vars.list.filter_map { |var| var.name if var.value.nil? }
           result = provider.retrieve(remaining_vars)
 
-          Vars.write_results!(result, provider)
+          Vars.write_results!(result, provider.name)
         end
       end
 
