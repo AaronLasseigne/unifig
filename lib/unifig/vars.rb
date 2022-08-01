@@ -38,7 +38,7 @@ module Unifig
       #
       # @return [Array<Unifig::Var>]
       def list
-        @map.values
+        (@map || {}).values
       end
 
       # Retrieve a variable by name unless it does not exist.

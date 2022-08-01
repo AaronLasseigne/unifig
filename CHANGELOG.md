@@ -3,6 +3,7 @@
 ## Fixed
 
 - Provider in Unifig::Var returned incorrectly
+- Fix early calls to Unifig::Vars.list
 
 # [0.3.1][] (2022-07-31)
 
