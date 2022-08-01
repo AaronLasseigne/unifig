@@ -18,13 +18,13 @@ If you want to use Unifig outside of a framework listed above you can manually a
 Add it to your Gemfile:
 
 ``` rb
-gem 'unifig', '~> 0.3.1'
+gem 'unifig', '~> 0.3.2'
 ```
 
 Or install it manually:
 
 ``` sh
-$ gem install unifig --version '~> 0.3.1'
+$ gem install unifig --version '~> 0.3.2'
 ```
 
 This project uses [Semantic Versioning][].
