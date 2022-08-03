@@ -53,7 +53,10 @@ Given that configuration, Unifig will attach two new methods to the `Unifig` cla
 From in your code you can call `Unifig.hello` to get the value of the variable and `Unifig.hello?` to see if the value was retrieved (for optional values).
 
 Unifig also allows you to override the overall configuration or the individual configuration by using environments.
-Here is an example where the `production` environment only pull from the `env` provider and in the `test` environment `Unifig.hello` will return `dlrow`:
+In the example below the `test` environment uses the default providers (i.e. `[local, env]`).
+The `production` environment is set to override that and only use `env`.
+In production, `Unifig.hello` would return whatever value was set for `HELLO` in the environment.
+In test it will return the locally set `dlrow`.
 
 ```yml
 config:
