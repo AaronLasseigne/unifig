@@ -32,7 +32,7 @@ Check out [GitHub releases][] for a detailed list of changes.
 
 ## Usage
 
-### Basics
+### Basic
 
 Unifig loads a [YAML configuration][] that instructs it on how to retrieve various external variables.
 These variable values come from providers.
@@ -72,18 +72,7 @@ HELLO:
       value: "dlrow"
 ```
 
-### Variable Substitutions
-
-Variables can be used in other variables with `${VAR}`.
-
-```rb
-USER:
-SERVICE_USERNAME: "${USER}_at_service"
-```
-
-Order of the variables does not matter but cyclical dependencies will throw an error.
-
-### Loading
+#### Loading
 
 Loading a configuration is handled through the `Unifig::Init` class.
 From `Unifig::Init` you can load the YAML as a string with `.load` or a file with `.load_file`.
@@ -138,9 +127,7 @@ You can load from a configuration file by using `load_file`.
 Unifig::Init.load_file('unifig.yml', env: :production)
 ```
 
-[API Documentation][]
-
-### YAML Configuration
+#### YAML Configuration
 
 The configuration YAML must contain a `config` key.
 A list of one or more providers must be given.
@@ -151,17 +138,90 @@ The first level of configurations apply to all environments.
 These can be overridden by setting the `envs` key and a key with the name of then environment and then redefining any settings.
 This is the case for the overall configuration as well as any variable configurations.
 
-### Providers
+#### Providers
 
 | Provider | Gem            |
 | -------- | -------------- |
 | Local    | Built-in       |
 | ENV      | [unifig-env][] |
 
-### Unifig::Vars
+### Advanced
+
+#### Variable Substitutions
+
+Variables can be used in other variables with `${VAR}`.
+
+```rb
+USER:
+SERVICE_USERNAME: "${USER}_at_service"
+```
+
+Order of the variables does not matter but cyclical dependencies will throw an error.
+
+#### Type Conversion
+
+By default, all values are converted to strings.
+If you want the value to be something other than a string you can assign a specific conversion.
+Unifig comes with some basic built-in conversions or you can convert to any class available.
+
+In order to convert a value you can provide a type to `convert`:
+
+```yml
+THREADS:
+  value: 5
+  convert: integer
+```
+
+Conversion works regardless of the provider of the value.
+
+##### Built-in
+
+There are a number of built-in types available.
+Basic types that have no additional options include `string` (the default), `symbol`, `float`, and `decimal` (i.e. `BigDecimal`).
+
+The `integer` type assumes base 10.
+This can be overridden by providing a `base` option:
+
+```yml
+BINARY_INPUT:
+  convert:
+    type: integer
+    base: 2
+```
+
+Unifig also provides `date`, `date_time`, and `time` all of which use `parse` by default.
+Any of them can be provided with a `format` option if you want to specify the format of the input.
+The `format` option uses `strptime` for the conversion.
+You can find all valid formats by looking at the standard Ruby documentation.
+
+```yml
+STARTS_ON:
+  convert:
+    type: date
+    format: %Y-%m-%d
+```
+
+##### Custom
+
+Any available class can be used as a converter by providing the class name as the `converter`.
+By default, `new` will be called on the class with the value passed in.
+To use a different method provide it via the `method` option.
+
+```yml
+IP_ADDRESS:
+  convert: IPAddr
+ENCODING:
+  convert:
+    type: Encoding
+    method: find
+```
+
+#### Unifig::Vars
 
 After loading the configuration you can use `Unifig::Vars` to check on what happened.
 It will return a list of `Unifig::Var`s with information such as which provider supplied the value.
+
+[API Documentation][]
 
 ## Contributing
 

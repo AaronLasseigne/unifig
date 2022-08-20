@@ -24,7 +24,7 @@ RSpec.describe Unifig::Vars do
       expect(vars.size).to be 2
       vars.each.with_index(1) do |var, value|
         expect(var).to be_an_instance_of Unifig::Var
-        expect(var.value).to be value
+        expect(var.value).to eql String(value)
         expect(var.provider).to be :local
       end
     end
@@ -35,7 +35,7 @@ RSpec.describe Unifig::Vars do
       var = described_class[:one]
 
       expect(var).to be_an_instance_of Unifig::Var
-      expect(var.value).to be 1
+      expect(var.value).to eql '1'
     end
   end
 end

@@ -92,6 +92,7 @@ module Unifig
 
       # @raise [CyclicalSubstitutionError] - Subtitutions resulted in a cyclical dependency.
       # @raise [MissingSubstitutionError] - A substitution does not exist.
+      # @raise (see Unifig::Var#value=)
       def complete_substitutions!
         Vars.tsort.each do |name|
           var = Vars[name]

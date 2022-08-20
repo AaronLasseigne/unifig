@@ -32,7 +32,7 @@ RSpec.shared_examples 'basic load tests' do
       subject
 
       expect(Unifig).to respond_to(:one)
-      expect(Unifig.one).to be 1
+      expect(Unifig.one).to eql '1'
     end
   end
 end
@@ -61,7 +61,7 @@ RSpec.describe Unifig::Init do
         load
 
         expect(Unifig.one).to eql '42'
-        expect(Unifig.two).to be 2
+        expect(Unifig.two).to eql '2'
       end
     end
 
@@ -81,7 +81,7 @@ RSpec.describe Unifig::Init do
         end
 
         it 'loads the var' do
-          expect(Unifig.one).to be 1
+          expect(Unifig.one).to eql '1'
         end
 
         it 'sets the predicate to true' do
@@ -146,7 +146,7 @@ RSpec.describe Unifig::Init do
         end
 
         it 'loads the var' do
-          expect(Unifig.one).to be 1
+          expect(Unifig.one).to eql '1'
         end
 
         it 'sets the predicate to true' do

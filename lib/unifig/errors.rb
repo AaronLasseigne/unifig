@@ -24,4 +24,7 @@ module Unifig
 
   # Raised if a substitution does not exist.
   MissingSubstitutionError = Class.new(Error)
+
+  # Raised if a type does not exist.
+  InvalidTypeError = Class.new(Error)
 end
