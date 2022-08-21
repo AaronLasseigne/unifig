@@ -34,118 +34,142 @@ Check out [GitHub releases][] for a detailed list of changes.
 
 ### Basic
 
-Unifig loads a [YAML configuration][] that instructs it on how to retrieve various external variables.
-These variable values come from providers.
-Unifig comes with a `local` provider which reads values straight from the configuration file.
-Additional providers may be installed.
+Unifig works by loading a YAML configuration that instructs it on how to retrieve and treat external variables.
+Variable values are retrieved from an ordered list of providers.
 
-The most minimal configuration would be:
+A provider is any source where you would retrieve variable values.
+Unifig comes with a `local` provider which reads values straight from the configuration file.
+Additional providers may be installed:
+
+| Provider | Gem            |
+| -------- | -------------- |
+| local    | Built-in       |
+| env      | [unifig-env][] |
+
+Providers are checked in order to find the variable values.
+If a variable is not found in the first provider, it will be requested from the second provider and so on until it is found.
+
+The YAML configuration should begin with a `config` key which lists the providers in the order you would like them checked:
+
+```yml
+config:
+  providers: [local, env]
+```
+
+You can list a single provider or an ordered array to check.
+
+Variables should be listed after the `config` key as their own keys.
+Here's a mininal example YAML:
 
 ```yml
 config:
   providers: local
 
+HELLO: "world"
+```
+
+When this YAML is loaded, Unifig will add two methods to it's core `Unifig` class.
+The first, `Unifig.hello` will return `"hello"` as the value it found from the `local` provider.
+The second method, `Unifig.hello?` allow you to check to see if the value was able to be retrived at all.
+
+```yml
+> Unifig.hello?
+# true
+> Unifig.hello
+# => "world"
+```
+
+Each variable listed in the YAML configuration will receive its own pair of methods on `Unifig`.
+
+Variables can be listed with the `local` value immediately following as seen above.
+They can also be defined with no `local` value:
+
+```yml
+HELLO:
+```
+
+Or they can be declared with the verbose syntax:
+
+```yaml
 HELLO:
   value: "world"
 ```
 
-Given that configuration, Unifig will attach two new methods to the `Unifig` class.
-From in your code you can call `Unifig.hello` to get the value of the variable and `Unifig.hello?` to see if the value was retrieved (for optional values).
+The verbose syntax is useful when additional configration is need as seen in the [Advanced](#advanced) section.
 
-Unifig also allows you to override the overall configuration or the individual configuration by using environments.
-In the example below the `test` environment uses the default providers (i.e. `[local, env]`).
-The `production` environment is set to override that and only use `env`.
-In production, `Unifig.hello` would return whatever value was set for `HELLO` in the environment.
-In test it will return the locally set `dlrow`.
+Loading a YAML configuration can be accomplished using the `Unifig::Init` class.
+From `Unifig::Init` you can load the YAML as a string with `.load` or as a file with `.load_file`.
+
+*NOTE: If you're using one of the framework gems, loading may be handled for you.*
+
+Loading from a string:
+
+```rb
+Unifig::Init.load(<<~YML)
+  config:
+    providers: local
+
+  HELLO: "world"
+YML
+```
+
+Loading from a file:
+
+```rb
+Unifig::Init.load_file('unifig.yml')
+```
+
+### Advanced
+
+#### Environments
+
+Different working environments may require different setups.
+This can be accomplished in the `config` key or within variable keys with the `envs` key.
+
+Assuming two environments, `developement` and `production`, let's say we want to use different providers for each.
+Whatever we set at the top level will operate as the default.
+From there we can use the `envs` key to override that behavior:
 
 ```yml
 config:
-  providers: [local, env]
+  providers: local
+  envs:
+    production:
+      providers: env
+
+HELLO: "world"
+```
+
+In the `development` environment we'll check the `local` provider but in `production` we'll use `env`.
+This will result with `Unifig.hello` returning `"world"` in `development` and whatever the value of the `HELLO` environment variable is in `production`.
+To select an environment, add it to `Unifig::Init.load` or `Unifig::Init.load_file`:
+
+```rb
+Unifig::Init.load(<<~YML, env: :development)
+  config:
+    providers: local
     envs:
       production:
         providers: env
 
+  HELLO: "world"
+YML
+```
+
+*NOTE: If you're using one of the framework gems, environments may be loaded automatically depending on the framework.*
+
+In addition to changing `config`, `envs` may be used inside variables.
+Any variable configuration may be overridden using `envs`:
+
+```yml
 HELLO:
   value: "world"
   envs:
-    test:
-      value: "dlrow"
+    production:
+      value: "universe"
 ```
 
-#### Loading
-
-Loading a configuration is handled through the `Unifig::Init` class.
-From `Unifig::Init` you can load the YAML as a string with `.load` or a file with `.load_file`.
-
-All variables are assumed to be required (not `nil` or a blank string).
-Variables can be made optional by using the `:optional` setting.
-If there is a required variable without a value, Unifig will throw an error when loading.
-
-```rb
-Unifig::Init.load(<<~YAML, env: :production)
-  config:
-    providers: local
-
-  HOST:
-    value: github.com
-    envs:
-      development:
-        value: localhost
-  PORT:
-    optional: true
-    envs:
-      development:
-        value: 8080
-YAML
-
-> Unifig.host?
-# true
-> Unifig.host
-# => "localhost"
-> Unifig.port?
-# true
-> Unifig.port
-# => 8080
-```
-
-If we replaced `:development` with `:production` inside the `load` call we'd get:
-
-```rb
-> Unifig.host?
-# true
-> Unifig.host
-# => "github.com"
-> Unifig.port?
-# false
-> Unifig.port
-# => nil
-```
-
-You can load from a configuration file by using `load_file`.
-
-```rb
-Unifig::Init.load_file('unifig.yml', env: :production)
-```
-
-#### YAML Configuration
-
-The configuration YAML must contain a `config` key.
-A list of one or more providers must be given.
-They are are checked in order to find the value for each variable.
-Variables are then listed by name.
-
-The first level of configurations apply to all environments.
-These can be overridden by setting the `envs` key and a key with the name of then environment and then redefining any settings.
-This is the case for the overall configuration as well as any variable configurations.
-
-#### Providers
-
-| Provider | Gem            |
-| -------- | -------------- |
-| Local    | Built-in       |
-| ENV      | [unifig-env][] |
-
-### Advanced
+Here we've set the `local` provider value to `"world"` for all environments with an override setting it to `"universe"` in the `production` environment.
 
 #### Variable Substitutions
 
@@ -236,7 +260,6 @@ Unifig is licensed under [the MIT License][].
 [unifig-rails]: https://github.com/AaronLasseigne/unifig-rails
 [Semantic Versioning]: http://semver.org/spec/v2.0.0.html
 [GitHub releases]: https://github.com/AaronLasseigne/unifig/releases
-[YAML configuration]: #yaml-configuration
 [API Documentation]: http://rubydoc.info/github/AaronLasseigne/unifig
 [our contribution guidelines]: CONTRIBUTING.md
 [unifig-env]: https://github.com/AaronLasseigne/unifig-env
