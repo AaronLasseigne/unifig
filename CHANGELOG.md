@@ -3,6 +3,7 @@
 ## Changed
 
 - All values are strings by default regardless of how they arrived.
+- The `config` key is now `unifig`.
 
 ## Added
 

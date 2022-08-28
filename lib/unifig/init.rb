@@ -10,7 +10,7 @@ module Unifig
       #
       # @example
       #   Unifig::Init.load(<<~YML, env: :development)
-      #     config:
+      #     unifig:
       #       envs:
       #         development:
       #           providers: local
@@ -54,7 +54,7 @@ module Unifig
       # @raise (see Unifig::Var.load!)
       # @raise (see .complete_substitutions!)
       def exec!(yml, env: nil)
-        config = Config.new(yml.delete(:config), env: env)
+        config = Config.new(yml.delete(:unifig), env: env)
 
         providers = Providers.list(config.providers)
         return if providers.empty?

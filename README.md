@@ -49,20 +49,20 @@ Additional providers may be installed:
 Providers are checked in order to find the variable values.
 If a variable is not found in the first provider, it will be requested from the second provider and so on until it is found.
 
-The YAML configuration should begin with a `config` key which lists the providers in the order you would like them checked:
+The YAML configuration should begin with a `unifig` key which lists the providers in the order you would like them checked:
 
 ```yml
-config:
+unifig:
   providers: [local, env]
 ```
 
 You can list a single provider or an ordered array to check.
 
-Variables should be listed after the `config` key as their own keys.
+Variables should be listed after the `unifig` key as their own keys.
 Here's a mininal example YAML:
 
 ```yml
-config:
+unifig:
   providers: local
 
 HELLO: "world"
@@ -106,7 +106,7 @@ Loading from a string:
 
 ```rb
 Unifig::Init.load(<<~YML)
-  config:
+  unifig:
     providers: local
 
   HELLO: "world"
@@ -124,14 +124,14 @@ Unifig::Init.load_file('unifig.yml')
 #### Environments
 
 Different working environments may require different setups.
-This can be accomplished in the `config` key or within variable keys with the `envs` key.
+This can be accomplished in the `unifig` key or within variable keys with the `envs` key.
 
 Assuming two environments, `developement` and `production`, let's say we want to use different providers for each.
 Whatever we set at the top level will operate as the default.
 From there we can use the `envs` key to override that behavior:
 
 ```yml
-config:
+unifig:
   providers: local
   envs:
     production:
@@ -146,7 +146,7 @@ To select an environment, add it to `Unifig::Init.load` or `Unifig::Init.load_fi
 
 ```rb
 Unifig::Init.load(<<~YML, env: :development)
-  config:
+  unifig:
     providers: local
     envs:
       production:
@@ -158,7 +158,7 @@ YML
 
 *NOTE: If you're using one of the framework gems, environments may be loaded automatically depending on the framework.*
 
-In addition to changing `config`, `envs` may be used inside variables.
+In addition to changing `unifig`, `envs` may be used inside variables.
 Any variable configuration may be overridden using `envs`:
 
 ```yml

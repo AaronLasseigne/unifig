@@ -20,7 +20,7 @@ RSpec.shared_examples 'basic load tests' do
   context 'with a valid config' do
     let(:str) do
       <<~YML
-        config:
+        unifig:
           providers: local
 
         ONE:
@@ -48,7 +48,7 @@ RSpec.describe Unifig::Init do
     context 'from multiple providers' do
       let(:str) do
         <<~YML
-          config:
+          unifig:
             providers: [local, forty_two]
 
           ONE:
@@ -71,7 +71,7 @@ RSpec.describe Unifig::Init do
       context 'that is available' do
         let(:str) do
           <<~YML
-            config:
+            unifig:
               providers: local
 
             ONE:
@@ -92,7 +92,7 @@ RSpec.describe Unifig::Init do
       context 'that is not available' do
         let(:str) do
           <<~YML
-            config:
+            unifig:
               providers: local
 
             ONE:
@@ -112,7 +112,7 @@ RSpec.describe Unifig::Init do
       context 'that is not blank' do
         let(:str) do
           <<~YML
-            config:
+            unifig:
               providers: local
 
             ONE:
@@ -137,7 +137,7 @@ RSpec.describe Unifig::Init do
 
         let(:str) do
           <<~YML
-            config:
+            unifig:
               providers: local
 
             ONE:
@@ -157,7 +157,7 @@ RSpec.describe Unifig::Init do
       context 'that is not available' do
         let(:str) do
           <<~YML
-            config:
+            unifig:
               providers: local
 
             ONE:
@@ -173,7 +173,7 @@ RSpec.describe Unifig::Init do
       context 'that is blank' do
         let(:str) do
           <<~YML
-            config:
+            unifig:
               providers: local
 
             ONE:
@@ -190,7 +190,7 @@ RSpec.describe Unifig::Init do
     context 'with substitutions' do
       let(:str) do
         <<~YML
-          config:
+          unifig:
             providers: local
 
           NAME:
@@ -209,7 +209,7 @@ RSpec.describe Unifig::Init do
       context 'when they are out of order' do
         let(:str) do
           <<~YML
-            config:
+            unifig:
               providers: local
 
             GREETING:
@@ -229,7 +229,7 @@ RSpec.describe Unifig::Init do
       context 'when they chain' do
         let(:str) do
           <<~YML
-            config:
+            unifig:
               providers: local
 
             INTRO:
@@ -251,7 +251,7 @@ RSpec.describe Unifig::Init do
       context 'when they cause a cycle' do
         let(:str) do
           <<~YML
-            config:
+            unifig:
               providers: local
 
             A:
@@ -271,7 +271,7 @@ RSpec.describe Unifig::Init do
       context 'when they do not exist' do
         let(:str) do
           <<~YML
-            config:
+            unifig:
               providers: local
 
             A:
