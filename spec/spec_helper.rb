@@ -41,9 +41,11 @@ RSpec.configure do |config|
             :forty_two
           end
 
-          def self.retrieve(var_names)
+          def self.retrieve(var_names, config)
+            num = config.fetch(:num, 42).to_s.freeze
+
             var_names.to_h do |var_name|
-              [var_name, '42'.freeze]
+              [var_name, num]
             end
           end
         end

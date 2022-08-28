@@ -50,4 +50,32 @@ RSpec.describe Unifig::Config do
       end
     end
   end
+
+  describe '#provider_config' do
+    it 'returns an empty config if none is provided' do
+      expect(config.provider_config(:local)).to eql({})
+    end
+
+    context 'with a configuration' do
+      let(:local_config) do
+        {
+          here: true
+        }
+      end
+      let(:config_hash) do
+        {
+          providers: {
+            list: 'local',
+            config: {
+              local: local_config
+            }
+          }
+        }
+      end
+
+      it 'returns the config info' do
+        expect(config.provider_config(:local)).to eql(local_config)
+      end
+    end
+  end
 end

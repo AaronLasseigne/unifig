@@ -65,6 +65,30 @@ RSpec.describe Unifig::Init do
       end
     end
 
+    context 'with provider configuration' do
+      let(:str) do
+        <<~YML
+          unifig:
+            providers:
+              list: [local, forty_two]
+              config:
+                forty_two:
+                  num: 24
+
+          ONE:
+          TWO:
+            value: 2
+        YML
+      end
+
+      it 'returns the values from the providers in order' do
+        load
+
+        expect(Unifig.one).to eql '24'
+        expect(Unifig.two).to eql '2'
+      end
+    end
+
     context 'with an optional var' do
       before { load }
 

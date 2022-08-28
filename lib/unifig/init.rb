@@ -61,7 +61,7 @@ module Unifig
 
         Vars.load!(yml, env)
 
-        fetch_from_providers!(providers)
+        fetch_from_providers!(providers, config)
 
         check_required_vars
 
@@ -72,10 +72,10 @@ module Unifig
         attach_missing_optional_methods!(missing_vars)
       end
 
-      def fetch_from_providers!(providers)
+      def fetch_from_providers!(providers, config)
         providers.each do |provider|
           remaining_vars = Vars.list.filter_map { |var| var.name if var.value.nil? }
-          result = provider.retrieve(remaining_vars)
+          result = provider.retrieve(remaining_vars, config.provider_config(provider.name))
 
           Vars.write_results!(result, provider.name)
         end

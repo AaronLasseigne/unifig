@@ -8,7 +8,7 @@ module Unifig
         :local
       end
 
-      def self.retrieve(var_names)
+      def self.retrieve(var_names, _config)
         var_names.to_h do |name|
           [name, Vars[name].local_value]
         end

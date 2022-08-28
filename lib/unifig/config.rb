@@ -25,5 +25,11 @@ module Unifig
 
       @providers = Array(providers).map(&:to_sym).freeze
     end
+
+    def provider_config(name)
+      return {} unless @env_config[:providers].is_a?(Hash)
+
+      @env_config.dig(:providers, :config, name) || {}
+    end
   end
 end

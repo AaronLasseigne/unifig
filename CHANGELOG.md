@@ -8,6 +8,7 @@
 ## Added
 
 - Values can now be converted to built-in or custom types.
+- Providers can now be configured.
 
 # [0.3.2][] (2022-08-01)
 
