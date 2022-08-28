@@ -14,7 +14,16 @@ module Unifig
     end
 
     def providers
-      @providers ||= Array(@env_config[:providers]).map(&:to_sym).freeze
+      return @providers if defined?(@providers)
+
+      providers =
+        if @env_config[:providers].is_a?(Hash)
+          @env_config.dig(:providers, :list)
+        else
+          @env_config[:providers]
+        end
+
+      @providers = Array(providers).map(&:to_sym).freeze
     end
   end
 end

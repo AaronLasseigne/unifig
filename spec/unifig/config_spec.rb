@@ -24,7 +24,7 @@ RSpec.describe Unifig::Config do
   end
 
   describe '#providers' do
-    it 'returns a list of providers for the selected env' do
+    it 'returns a list of providers' do
       expect(config.providers).to eql %i[local]
     end
 
@@ -33,6 +33,20 @@ RSpec.describe Unifig::Config do
 
       it 'returns the list of providers for that env' do
         expect(config.providers).to eql %i[local forty_two]
+      end
+    end
+
+    context 'with a :list' do
+      let(:config_hash) do
+        {
+          providers: {
+            list: 'local'
+          }
+        }
+      end
+
+      it 'returns a list of providers' do
+        expect(config.providers).to eql %i[local]
       end
     end
   end
