@@ -45,6 +45,7 @@ Additional providers may be installed:
 | -------- | -------------- |
 | local    | Built-in       |
 | env      | [unifig-env][] |
+| env-file | [unifig-env][] |
 
 Providers are checked in order to find the variable values.
 If a variable is not found in the first provider, it will be requested from the second provider and so on until it is found.
