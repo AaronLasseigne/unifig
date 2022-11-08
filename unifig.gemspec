@@ -19,14 +19,14 @@ Gem::Specification.new do |spec|
   spec.metadata['changelog_uri'] = "#{spec.homepage}/blob/main/CHANGELOG.md"
   spec.metadata['rubygems_mfa_required'] = 'true'
 
-  spec.required_ruby_version = '>= 2.7.0'
-
-  spec.add_dependency 'tsort', '0.1.0'
-
   spec.files =
     %w[CHANGELOG.md CONTRIBUTING.md LICENSE.txt README.md] +
     Dir.glob(File.join('lib', '**', '*.rb'))
   spec.test_files = Dir.glob(File.join('spec', '**', '*.rb'))
   spec.bindir = 'exe'
   spec.executables = spec.files.grep(%r{\Aexe/}) { |f| File.basename(f) }
+
+  spec.required_ruby_version = '>= 2.7.0'
+
+  spec.add_dependency 'tsort', '0.1.0'
 end
