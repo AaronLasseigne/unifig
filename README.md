@@ -3,7 +3,7 @@
 Unifig is a pluggable system for loading external variables from one or more providers (e.g. `ENV`).
 
 [![Version](https://img.shields.io/gem/v/unifig.svg?style=flat-square)](https://rubygems.org/gems/unifig)
-[![Test](https://img.shields.io/github/workflow/status/AaronLasseigne/unifig/Test?label=Test&style=flat-square)](https://github.com/AaronLasseigne/unifig/actions?query=workflow%3ATest)
+[![Test](https://img.shields.io/github/actions/workflow/status/AaronLasseigne/unifig/test.yml?label=Test&style=flat-square&branch=main)](https://github.com/AaronLasseigne/unifig/actions?query=workflow%3ATest)
 
 ## Installation
 
